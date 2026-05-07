@@ -1,0 +1,218 @@
+﻿<Window x:Class="TestWpfApp.Views.Resaults"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestWpfApp.Views"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        WindowStyle="None" 
+        WindowState ="Maximized"
+        Title=" Результаты тестирования " Height="900" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
+    <Window.Template>
+        <ControlTemplate TargetType="Window">
+            <Border Name="newBorder" 
+                    CornerRadius="2" 
+                    BorderBrush="#FF0C9A28" 
+                    BorderThickness="5">
+                <Border.Background>
+                    <ImageBrush ImageSource="/main.jpg"  Stretch="UniformToFill"/>
+                </Border.Background>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{TemplateBinding Title}" 
+                               Opacity="0.5" 
+                               FontSize="30" 
+                               Margin="8"
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center" 
+                               Background="White"/>
+                    <Border Grid.Row="1">
+                        <AdornerDecorator>
+                            <ContentPresenter />
+                        </AdornerDecorator>
+                    </Border>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </Window.Template>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="0.01*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="11*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Rectangle 
+                RadiusX="30" 
+                RadiusY="30" 
+                Fill="White" 
+                Opacity="0.9" 
+                Grid.Column="1"
+                Grid.ColumnSpan="1"
+                Grid.Row="0"
+                Grid.RowSpan="1"
+                />
+        <Rectangle 
+                RadiusX="30" 
+                RadiusY="30" 
+                Fill="White" 
+                Opacity="0.9" 
+                Grid.Column="1"
+                Grid.ColumnSpan="1"
+                Grid.Row="2"
+                Grid.RowSpan="1"
+                />
+        <TextBlock 
+            Margin="25,5,10,5"
+            Grid.Column="1" 
+            Grid.Row="0" 
+            FontSize="15"
+            HorizontalAlignment="Center"
+                Text="Вопросы отвеченные неправильно:"/>
+        <ScrollViewer 
+            Grid.Column="1" 
+            Grid.Row="0" 
+            Margin="0,30,1,30">
+            <ListBox 
+            Grid.Column="1" 
+                FontSize="15"
+            Grid.Row="2" 
+                HorizontalAlignment="Center"
+                ItemsSource="{Binding IncorrectTestQuestions}" 
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Margin="15,0,0,0">
+                <ListBox.Template>
+                    <ControlTemplate>
+                        <DockPanel LastChildFill="True">
+                            <Grid DockPanel.Dock="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="75"></ColumnDefinition>
+                                    <ColumnDefinition Width="75"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                            <ItemsPresenter></ItemsPresenter>
+                        </DockPanel>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemTemplate >
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <Image Source="{Binding FullImageQuestion}" 
+                                   Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" 
+                                   Width="450"
+                                   HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding NameQuestion}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Правильный ответ: " Foreground="Green"/>
+                                <TextBlock Text="{Binding NameAnswerCorrect1}" Foreground="Green"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Ваш ответ: " Foreground="Red"/>
+                                <TextBlock Text="{Binding NameAnswer}" Foreground="Red"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+
+        <TextBlock 
+            Margin="25,5,10,5"
+            Grid.Column="1" 
+            Grid.Row="2" 
+            FontSize="15"
+            HorizontalAlignment="Center"
+                Text="Вопросы отвеченные правильно:"/>
+
+        <ScrollViewer 
+            Grid.Column="1" 
+            Grid.Row="2" 
+            Margin="0,30,1,30">
+            <ListBox 
+            Grid.Column="1" 
+            Grid.Row="2" 
+                HorizontalAlignment="Center"
+                FontSize="15"
+            ItemsSource="{Binding CorrectTestQuestions}" 
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Margin="15,0,0,0">
+                <ListBox.Template>
+                    <ControlTemplate>
+                        <DockPanel LastChildFill="True">
+                            <Grid DockPanel.Dock="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="75"></ColumnDefinition>
+                                    <ColumnDefinition Width="75"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                            <ItemsPresenter></ItemsPresenter>
+                        </DockPanel>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemTemplate >
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <Image Source="{Binding FullImageQuestion}" 
+                                   Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" 
+                                   Width="450"
+                                   HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding NameQuestion}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Правильный ответ: " Foreground="Green"/>
+                                <TextBlock Text="{Binding NameAnswerCorrect1}" Foreground="Green"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+        <StackPanel Orientation="Horizontal" 
+                    VerticalAlignment="Center" 
+                    Grid.Row="3"   
+                    HorizontalAlignment="Center"
+                    Grid.Column="1">
+            <Button IsDefault="True" 
+                    Visibility="{Binding VisibilityButtonResults, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Command="{Binding SaveCommand}" 
+                    Height="40"
+                    Style="{StaticResource crud_button_template}"
+                    Content=" Сохранить отчет "                    
+                    HorizontalAlignment="Center">
+            </Button>
+            
+        </StackPanel>
+        <Button IsDefault="True"
+                Command="{Binding SaveFileCommand}" 
+                Grid.Row="3"   
+                    Grid.Column="1"
+            Height="40"
+                    Style="{StaticResource crud_button_template}"
+                    Content=" Сохранить результаты в текст "                    
+                    HorizontalAlignment="Left">
+        </Button>
+        <Button IsDefault="False" 
+                    Grid.Row="3"   
+                Margin="5"
+                    Grid.Column="1"
+                    Command="{Binding CloseCommand}"
+                Style="{StaticResource close_button_template}" 
+                    Content=" Завершить тест " 
+                    HorizontalAlignment="Right"/>
+    </Grid>
+</Window>

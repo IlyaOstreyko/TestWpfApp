@@ -1,0 +1,212 @@
+﻿<Window x:Class="TestWpfApp.Views.ShowQuestion"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestWpfApp.Views"
+        mc:Ignorable="d"
+        WindowStyle="None" 
+        AllowsTransparency="True"
+        WindowState ="Maximized"
+        Title=" Выберите ответ " WindowStartupLocation="CenterScreen" Width="800" Height="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
+    <Window.Template>
+        <ControlTemplate TargetType="Window">
+            <Border Name="newBorder" 
+                    CornerRadius="2" 
+                    BorderBrush="#FF0C9A28" 
+                    BorderThickness="5">
+                <Border.Background>
+                    <ImageBrush ImageSource="/main.jpg"  Stretch="UniformToFill"/>
+                </Border.Background>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{TemplateBinding Title}" 
+                               Opacity="0.5" 
+                               Margin="8"
+                               FontSize="30" 
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center" 
+                               Background="White"/>
+                    <Border Grid.Row="1">
+                        <AdornerDecorator>
+                            <ContentPresenter />
+                        </AdornerDecorator>
+                    </Border>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </Window.Template>
+    
+    <Grid ShowGridLines="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="11*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Rectangle 
+                RadiusX="30" 
+                RadiusY="30" 
+                Fill="White" 
+                Opacity="0.9" 
+                Grid.Column="1"
+                Grid.ColumnSpan="1"
+                Grid.Row="0"
+                Grid.RowSpan="15"
+                />
+
+        <StackPanel Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Top" 
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Grid.RowSpan="4">
+            <Image Source="{Binding Image, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <StackPanel Orientation="Vertical" Margin="20">
+                <Label Content="Тема: " FontSize="15" />
+                <TextBlock Text="{Binding TestQuestion.NameTheme}" FontSize="20" TextWrapping="Wrap"/>
+                <Label Content="Название специальности: " 
+                   FontSize="15"
+                   Visibility="{Binding VisibilityNameSpeciality, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <TextBlock Text="{Binding TestQuestion.NameSpeciality}" FontSize="15" TextWrapping="Wrap"/>
+            </StackPanel>
+
+        </StackPanel>
+        <DockPanel  
+                    HorizontalAlignment="Center" 
+                    Grid.Column="1"
+                    Width="1000"
+                    Grid.Row="4" 
+                    Grid.RowSpan="4">
+            <Label DockPanel.Dock="Top" Content="Вопрос: " FontSize="17" />
+            <ScrollViewer Width="1000" Background="#b8ffb8" Opacity="0.8">
+                <TextBlock Text="{Binding TestQuestion.NameQuestion}" 
+                               Width="Auto" 
+                               FontSize="17"
+                               HorizontalAlignment="Center"
+                               ScrollViewer.VerticalScrollBarVisibility="Auto"
+                               TextWrapping="Wrap" />
+            </ScrollViewer>
+        </DockPanel>
+
+
+        <Button Content="  Пропустить вопрос  " 
+                Command="{Binding SkipQuestionCommand}" 
+                Height="40" 
+                Grid.Row="15" 
+                Grid.Column="1" 
+                HorizontalAlignment="Left"
+                Style="{StaticResource crud_button_template}"/>
+        <Button Content="{Binding NameButton}" 
+                IsDefault="True" 
+                Command="{Binding NextQuestionCommand}" 
+                Width="280"                 
+                Height="40" 
+                Grid.Row="15" 
+                Grid.Column="1" 
+                Style="{StaticResource crud_button_template}"/>
+        <Button IsCancel="True"
+                Content=" Закрыть "
+                IsDefault="False"
+                Style="{StaticResource close_button_template}"
+                Margin ="5"
+                Grid.Row="15"
+                Grid.Column="1"
+                Visibility="{Binding VisibilityTest, Converter={StaticResource BoolToVisibilityConverter}}"
+                HorizontalAlignment="Right"/>
+
+        <StackPanel Orientation="Horizontal" 
+                    HorizontalAlignment="Left" 
+                    VerticalAlignment="Center"
+                    Margin="30,0,0,0"
+                    Grid.Column="1"
+                    Grid.Row="14">
+            <Label Content="  Вопрос" FontSize ="15"/>
+            <Label Content="{Binding TestQuestion.NumberInList}"  FontSize ="17"/>
+            <Label Content="из" FontSize ="15"/>
+            <Label Content="{Binding QuantityQuestion}"   FontSize ="17" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Center"
+                    Margin="0,0,30,0"
+                    Grid.Column="1"
+                    Grid.Row="14"
+                    Visibility="{Binding VisibilityTime, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Label Content="Остаток времени: " FontSize ="15" VerticalAlignment="Center"/>
+            <Label Content="{Binding FormattedTimeLeft}"  FontSize ="30" Foreground="Red"/>
+        </StackPanel>
+
+        <GroupBox Header="Выберите ответ" 
+                  Grid.Row="8" 
+                  HorizontalAlignment="Center"
+                  FontSize="17"
+                      MinWidth="1000"
+                  Grid.Column="1"
+                  Grid.RowSpan="6">
+            <ScrollViewer Background="#b8ffb8" Opacity="0.8" >
+                <StackPanel HorizontalAlignment="Center" >
+                    <RadioButton 
+                    GroupName="AnswersRadioButton"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    VerticalContentAlignment="Center"
+                    IsChecked="{Binding Answer1}">
+                        <RadioButton.Content>
+                            <Label 
+                                
+                            BorderThickness="1"
+                            Content="{Binding Answers.NameAnswer1}" />
+                        </RadioButton.Content>
+                    </RadioButton>
+                    <RadioButton VerticalContentAlignment="Center" GroupName="AnswersRadioButton" IsChecked="{Binding Answer2}">
+                        <RadioButton.Content>
+                            <Label 
+                            BorderThickness="1"
+                            Content="{Binding Answers.NameAnswer2}" />
+                        </RadioButton.Content>
+                    </RadioButton>
+                    <RadioButton VerticalContentAlignment="Center" GroupName="AnswersRadioButton" IsChecked="{Binding Answer3}">
+                        <RadioButton.Content>
+                            <Label 
+                            BorderThickness="1"
+                            Content="{Binding Answers.NameAnswer3}" />
+                        </RadioButton.Content>
+                    </RadioButton>
+                    <RadioButton VerticalContentAlignment="Center" GroupName="AnswersRadioButton" IsChecked="{Binding Answer4}">
+                        <RadioButton.Content>
+                            <Label 
+                            BorderThickness="1"
+                            Content="{Binding Answers.NameAnswer4}" />
+                        </RadioButton.Content>
+                    </RadioButton>
+                </StackPanel>
+            </ScrollViewer>
+        </GroupBox>
+        
+        
+    </Grid>
+</Window>

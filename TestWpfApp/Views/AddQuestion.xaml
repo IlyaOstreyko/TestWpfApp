@@ -1,0 +1,299 @@
+﻿<Window x:Class="TestWpfApp.Views.AddQuestion"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestWpfApp.Views"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        WindowStyle="None" 
+        WindowState ="Maximized"
+        Title="{Binding Title}" Height="900" Width="850">
+    <Window.Template>
+        <ControlTemplate TargetType="Window">
+            <Border Name="newBorder" 
+                    CornerRadius="2" 
+                    BorderBrush="#FF0C9A28" 
+                    BorderThickness="5">
+                <Border.Background>
+                    <ImageBrush ImageSource="/main.jpg"  Stretch="UniformToFill"/>
+                </Border.Background>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{TemplateBinding Title}" 
+                               Opacity="0.5" 
+                               FontSize="30"
+                               Margin="8"
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center" 
+                               Background="White"/>
+                    <Border Grid.Row="1">
+                        <AdornerDecorator>
+                            <ContentPresenter />
+                        </AdornerDecorator>
+                    </Border>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </Window.Template>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*" />
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height ="1*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1.7*" />
+            <ColumnDefinition Width="9.3*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Rectangle 
+            RadiusX="30" 
+            RadiusY="30" 
+            Fill="White" 
+            Opacity="0.9" 
+            Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="11"/>
+        <Label x:Name="Name_QuestionLabel"         
+               Content="Вопрос:" 
+               FontSize="15"
+               Margin="10,0,0,0"
+               HorizontalAlignment="Center" 
+               VerticalAlignment="Center"
+               Grid.Column="1" Grid.Row="0"/>
+        <Label x:Name="Name_SpecialityLabel"    Margin="10,0,0,0"   
+               Content="Специальность:"
+               FontSize="15"
+               HorizontalAlignment="Center" 
+               VerticalAlignment="Center" 
+               Grid.Column="1" Grid.Row="1"/>
+        <Label x:Name="Name_Article"         Margin="10,0,0,0"     
+               Content="Пояснение:"     
+               FontSize="15"
+               HorizontalAlignment="Center" 
+               VerticalAlignment="Center"
+               Grid.Column="1" Grid.Row="3"/>
+        <Label x:Name="Name_ThemeLabel"       Margin="10,0,0,0" 
+               Content="Тема:"      
+               FontSize="15"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Grid.Column="1" Grid.Row="2"/>
+        <Label x:Name="Name_AnswerCorrect1Label" Margin="10,0,0,0"
+               Content="Правильный ответ:" 
+               FontSize="15"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Grid.Column="1" Grid.Row="4"/>
+        <Label x:Name="Name_AnswerIncorrect1Label" Margin="10,0,0,0"
+               Content="Неправильный ответ:" 
+               FontSize="15"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Grid.Column="1" Grid.Row="5"/>
+        <Label x:Name="Name_AnswerIncorrect2Label" Margin="10,0,0,0"
+               Content="Неправильный ответ:" 
+               FontSize="15"
+               HorizontalAlignment="Center" 
+               VerticalAlignment="Center"
+               Grid.Column="1" Grid.Row="6"/>
+        <Label x:Name="Name_AnswerIncorrect3Label" Margin="10,0,0,0"
+               Content="Неправильный ответ:" 
+               FontSize="15"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Grid.Column="1" Grid.Row="7"/>
+        <Label x:Name="Name_image"          Margin="10,0,0,0"
+               Content="Картинка:"  
+               FontSize="15"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center" 
+               Grid.Column="1"               Grid.Row="8"/>
+        <Image Source="{Binding ImageSource}" Margin="0,0,0,7"
+               Grid.Row="8" Grid.Column="2" Grid.RowSpan="3"/>
+        <TextBox x:Name="Name_QuestionTextBox" 
+                 Margin="10,8,15,8"
+                 AcceptsReturn="True"
+                 Text="{Binding TestQuestion.NameQuestion}"         
+                 Grid.Row="0" Grid.Column="2"/>
+        <TextBox x:Name="Name_SpecialityTextBox" 
+                 Text="{Binding TestQuestion.NameSpeciality}"   
+                 Margin="10,8,15,8"
+                 AcceptsReturn="True"
+                 Grid.Row="1" Grid.Column="2"/>
+
+        <Grid      
+            
+            Grid.Row="2" 
+            Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="140"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox
+                Grid.Column="0"
+                Margin="10,8,5,8"
+                Name="deviceSelector"
+                ItemsSource="{Binding Path=Themes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                SelectedItem="{Binding Path=SelectionTheme, UpdateSourceTrigger=PropertyChanged}">
+            </ComboBox>
+            <Button
+                Margin="5,8,15,8"
+                Grid.Column="1"
+                IsDefault="False"                 
+                    Command="{Binding AddNewThemeCommand}" 
+                    Style="{StaticResource crud_button_template}"
+                    Content="  Добавить &#13;новую тему "                    
+                    HorizontalAlignment="Stretch">
+            </Button>
+        </Grid>
+
+
+
+
+        <TextBox x:Name="Name_ArticleTextBox"
+                 Margin="10,8,15,8"
+                 AcceptsReturn="True"
+                 Text="{Binding TestQuestion.NameArticle   }"        
+                 Grid.Row="3" Grid.Column="2"/>
+        <TextBox x:Name="Name_AnswerCorrect1TextBox"
+                 Margin="10,8,15,8"
+                 AcceptsReturn="True"
+                 Text="{Binding TestQuestion.NameAnswerCorrect1}"   
+                 Grid.Row="4" Grid.Column="2"/>
+        <TextBox x:Name="Name_AnswerIncorrect1TextBox"
+                 Margin="10,8,15,8"
+                 AcceptsReturn="True"
+                 Text="{Binding TestQuestion.NameAnswerIncorrect1}"
+                 Grid.Row="5" Grid.Column="2"/>
+        <TextBox x:Name="Name_AnswerIncorrect2TextBox"
+                 Margin="10,8,15,8"
+                 AcceptsReturn="True"
+                 Text="{Binding TestQuestion.NameAnswerIncorrect2}"
+                 Grid.Row="6" Grid.Column="2"/>
+        <TextBox x:Name="Name_AnswerIncorrect3TextBox"
+                 Margin="10,8,15,8"
+                 AcceptsReturn="True"
+                 Text="{Binding TestQuestion.NameAnswerIncorrect3}"
+                 Grid.Row="7" Grid.Column="2"/>
+
+        <StackPanel Orientation="Horizontal" 
+                    VerticalAlignment="Center" 
+                    Grid.Row="5"   
+                    Width="200" Height="30"
+                    HorizontalAlignment="Left"
+                    Visibility='Hidden'
+                    Grid.Column="2">
+            <ProgressBar Minimum="0"
+                 Maximum="100"
+                 Height="20"
+                 Value="{Binding ProgressValue}"
+                 Foreground="SteelBlue"
+                 Background="#FFEFEFEF"
+                 BorderBrush="#FFBFBFBF"
+                 BorderThickness="1"/>
+            <TextBlock Text="{Binding ProgressValue, StringFormat='Импорт: {0}%'}"
+               HorizontalAlignment="Center"
+               Margin="0,5,0,0"
+               FontWeight="Bold"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" 
+                    VerticalAlignment="Center" 
+                    Grid.Row="11"   
+                    HorizontalAlignment="Left"
+                    Grid.Column="2">
+
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" 
+                    VerticalAlignment="Center" 
+                    Grid.Row="11"   
+                    HorizontalAlignment="Center"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2">
+            <Button IsDefault="False" 
+                    Height="40"
+                    Command="{Binding SaveQuestionCommand}" 
+                    Style="{StaticResource crud_button_template}"
+                    Content=" Сохранить "                    
+                    HorizontalAlignment="Stretch">
+            </Button>
+            <Button IsDefault="False" 
+                    Height="40"
+                    Command="{Binding MigrateOldDatabaseCommand}" 
+                    Style="{StaticResource crud_button_template}"
+                    HorizontalAlignment="Center"
+                    Content=" Из базы "
+                    Visibility="{Binding VisibilityAdd, Converter={StaticResource BoolToVisibilityConverter}}">
+            </Button>
+            <Button IsDefault="False" 
+                    Height="40"
+                    Command="{Binding AddQuestionFromFileCommand}" 
+                    Style="{StaticResource crud_button_template}"
+                    HorizontalAlignment="Center"
+                    Content=" Из файла "
+                    Visibility="{Binding VisibilityAdd, Converter={StaticResource BoolToVisibilityConverter}}">
+            </Button>
+            <Button IsDefault="False" 
+                    Command="{Binding FileCommand}" 
+                    Height="40"
+                    Style="{StaticResource crud_button_template}"
+                    HorizontalAlignment="Center"
+                    Content=" Показать пример "
+                    Visibility="{Binding VisibilityAdd, Converter={StaticResource BoolToVisibilityConverter}}">
+            </Button>
+            <Button IsCancel="True"
+                    IsDefault="False"
+                    Grid.Column="2"
+                    Grid.Row="11" 
+                Style="{StaticResource close_button_template}" 
+                    Margin ="5"
+                    Content=" Отмена " 
+                    HorizontalAlignment="Right"/>
+        </StackPanel>
+
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Row="9" Grid.Column="1" >
+            <Button x:Name="Button_Add_Image" 
+                    IsDefault="False"
+                    Height="30"
+                    Command="{Binding AddImageCommand}" 
+                    Style="{StaticResource crud_button_template}"
+                    Content="{Binding TitleImageButton}"></Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Row="10" Grid.Column="1" >
+            <Button x:Name="Button_Delete_Image" 
+                    IsDefault="False"
+                    Height="30"
+                    Command="{Binding DeleteImageCommand}" 
+                    Style="{StaticResource crud_button_template}"
+                    Content=" Удалить картинку "
+                    Visibility="{Binding VisibilityDelete, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
+        </StackPanel>
+
+    </Grid>
+</Window>

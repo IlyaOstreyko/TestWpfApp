@@ -1,0 +1,244 @@
+﻿<Window x:Class="TestWpfApp.Views.EditQuestions"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestWpfApp.Views"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        WindowStyle="None" 
+        WindowState ="Maximized"
+        Title="{Binding Title}" Height="900" Width="850">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
+    <Window.Template>
+        <ControlTemplate TargetType="Window">
+            <Border Name="newBorder" 
+                    CornerRadius="2" 
+                    BorderBrush="#FF0C9A28" 
+                    BorderThickness="5">
+                <Border.Background>
+                    <ImageBrush ImageSource="/main.jpg"  Stretch="UniformToFill"/>
+                </Border.Background>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{TemplateBinding Title}" 
+                               Opacity="0.5" 
+                               FontSize="30" 
+                               Margin="8"
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center" 
+                               Background="White"/>
+                    <Border Grid.Row="1">
+                        <AdornerDecorator>
+                            <ContentPresenter />
+                        </AdornerDecorator>
+                    </Border>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </Window.Template>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1.5*"/>
+            <RowDefinition Height="0.05*" />
+            <RowDefinition Height="5.5*" />
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="11*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Rectangle 
+                RadiusX="30" 
+                RadiusY="30" 
+                Fill="White" 
+                Opacity="0.9" 
+                Grid.Column="1"
+                Grid.ColumnSpan="1"
+                Grid.Row="0"
+                Grid.RowSpan="1"
+                />
+        <Rectangle 
+                RadiusX="30" 
+                RadiusY="30" 
+                Fill="White" 
+                Opacity="0.9" 
+                Grid.Column="1"
+                Grid.ColumnSpan="1"
+                Grid.Row="2"
+                Grid.RowSpan="1"
+                />
+        <Grid      
+            Margin="10,5,10,5"
+            Grid.Row="0" 
+            Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+                <RowDefinition  Height="25"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock 
+                Grid.Row="0"
+                HorizontalAlignment="Center"
+                FontSize="16"
+                Margin="10,5,10,0"
+                Text="Выберите тему:"/>
+            <!--<ComboBox 
+                Grid.Row="1"
+                ItemsSource="{Binding Path=Themes}"
+                SelectedValue="{Binding Path=SelectionTheme}"
+                IsEditable="False"
+                Margin="10,0,10,0"/>-->
+            <ScrollViewer 
+            Grid.Column="1" 
+            Grid.Row="1" 
+            Margin="0,0,-10,0">
+                <ListBox x:Name="_Themes" 
+                     Grid.Row="1" 
+                         HorizontalAlignment="Stretch"
+                         HorizontalContentAlignment="Stretch"
+                     ItemsSource="{Binding Themes}" 
+                     Background="{x:Null}"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     BorderBrush="{x:Null}" Margin="0,0,0,0">
+                    <ListBox.Template>
+                        <ControlTemplate>
+                            <DockPanel LastChildFill="True">
+                                <ItemsPresenter></ItemsPresenter>
+                            </DockPanel>
+                        </ControlTemplate>
+                    </ListBox.Template>
+                    <ListBox.ItemTemplate >
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button IsDefault="False" 
+                                        Command="{Binding DataContext.ShowCommand,RelativeSource={RelativeSource AncestorType=Window, AncestorLevel=1}}"                                
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource crud_button_template}"  
+                                        Width="Auto"
+                                        HorizontalAlignment="Stretch"
+                                        Content="{Binding}"/>
+
+                                <!--<CheckBox IsChecked="{Binding Tag}"/>-->
+                                <!--<RadioButton 
+                Grid.Row="1"
+                GroupName="GroundUpper" 
+                HorizontalAlignment="Center"
+                IsChecked="{Binding SelectionTheme,                                                                           Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsEnabled="{Binding IsGroundUpperRadioButtonEnabled}" />-->
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+
+            <!--<Button IsDefault="True" Command="{Binding ShowQuestionsCommand}" 
+                    Grid.Row="2" 
+                    Margin="10,5,10,5"
+                    Style="{StaticResource crud_button_template}"
+                    Width="150" 
+                    Height="20"
+                    Content=" Показать вопросы "/>-->
+        </Grid>
+
+        <ScrollViewer 
+            Grid.Column="1" 
+            Grid.Row="2" 
+            Margin="0,30,1,30">
+            <ListBox 
+            Grid.Column="1" 
+            Grid.Row="2" 
+                FontSize="16"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+            ItemsSource="{Binding TestQuestions, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Margin="15,0,0,0">
+                <ListBox.Template>
+                    <ControlTemplate>
+                        <DockPanel LastChildFill="True">
+                            <Grid DockPanel.Dock="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="75"></ColumnDefinition>
+                                    <ColumnDefinition Width="75"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                            <ItemsPresenter></ItemsPresenter>
+                        </DockPanel>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemTemplate >
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                            <Image Source="{Binding FullImageQuestion, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                   AllowDrop="True" 
+                                   Width="450"
+                                   HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding NameQuestion, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="1. " Foreground="Green"/>
+                                <TextBlock Text="{Binding NameAnswerCorrect1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Green"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="2. " Foreground="Red"/>
+                                <TextBlock Text="{Binding NameAnswerIncorrect1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="3. " Foreground="Red"/>
+                                <TextBlock Text="{Binding NameAnswerIncorrect2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="4. " Foreground="Red"/>
+                                <TextBlock Text="{Binding NameAnswerIncorrect3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button IsDefault="False" 
+                                Command="{Binding DataContext.DeleteCommand,RelativeSource={RelativeSource AncestorType=Window, AncestorLevel=1}}"                                
+                                    CommandParameter="{Binding}"
+                                Style="{StaticResource crud_button_template}"
+                                Width="150" 
+                                Height="25"
+                                Margin ="10"
+                                        FontSize="15"
+                                    Visibility="{Binding DataContext.VisibilityManager, RelativeSource={RelativeSource AncestorType=Window, AncestorLevel=1}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    HorizontalAlignment="Left"
+                                Content=" Удалить вопрос "/>
+                                <Button IsDefault="False" 
+                                Command="{Binding DataContext.EditCommand,RelativeSource={RelativeSource AncestorType=Window, AncestorLevel=1}}"                                
+                                    CommandParameter="{Binding}"
+                                Style="{StaticResource crud_button_template}"
+                                Width="200" 
+                                Height="25"
+                                        FontSize="15"
+                                Margin ="10"
+                                    Visibility="{Binding DataContext.VisibilityManager, RelativeSource={RelativeSource AncestorType=Window, AncestorLevel=1}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    HorizontalAlignment="Left"
+                                Content=" Редактировать вопрос "/>
+                            </StackPanel>
+
+
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+        <Button IsCancel="True"
+                IsDefault="False"
+                Style="{StaticResource close_button_template}" 
+                Content=" Закрыть " 
+                Grid.Column="1"
+                Grid.Row="3"
+                Margin ="5"
+                HorizontalAlignment="Right"/>
+    </Grid>
+</Window>

@@ -1,0 +1,125 @@
+﻿<Window x:Class="TestWpfApp.Views.Sample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestWpfApp.Views"
+        mc:Ignorable="d"
+        WindowStyle="None"     
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        WindowState ="Maximized"
+        
+        Title=" Образец заполнения файла с вопросами " Height="900" Width="850">
+    <Window.Template>
+        <ControlTemplate TargetType="Window">
+            <Border Name="newBorder" 
+                    CornerRadius="2" 
+                    BorderBrush="#FF0C9A28" 
+                    BorderThickness="5">
+                <Border.Background>
+                    <ImageBrush ImageSource="/main.jpg"  Stretch="UniformToFill"/>
+                </Border.Background>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{TemplateBinding Title}" 
+                               Opacity="0.5" 
+                               FontSize="30" 
+                               Margin="8"
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center" 
+                               Background="White"/>
+                    <Border Grid.Row="1">
+                        <AdornerDecorator>
+                            <ContentPresenter />
+                        </AdornerDecorator>
+                    </Border>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </Window.Template>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="11*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Rectangle 
+            RadiusX="30" 
+            RadiusY="30" 
+            Fill="White" 
+            Opacity="0.9" 
+            Grid.Column="1" Grid.ColumnSpan="1" Grid.Row="0" Grid.RowSpan="1"/>
+        
+        <Button IsCancel="True"
+                    IsDefault="True"
+                Grid.Row="2"   
+                Margin="5"
+                    Grid.Column="1"
+                Style="{StaticResource close_button_template}" 
+                    Content=" Закрыть " 
+                    HorizontalAlignment="Right"/>
+        <TextBox 
+            Margin="25,5,10,5"
+            Grid.Column="1" 
+            Grid.Row="0" 
+            HorizontalAlignment="Center"
+            IsReadOnly="True"
+            BorderThickness="0"
+            Background="Transparent"
+                Text="W=3&#13;
+&#13;
+Л1 Правила по охране труда при ведении лесного хозяйства,&#13;
+обработке древесины и производстве изделий из дерева (Утв. пост.&#13;
+Министерства труда и социальной защиты РБ и Министерства&#13;
+лесного хозяйства РБ от 30.03.2020 г. № 32/5)&#13;
+&#13;
+Л2 Технический кодекс установившейся практики ТКП 45-1.04-78-2007 (02250)&#13;
+ТЕХНИЧЕСКАЯ ЭКСПЛУАТАЦИЯ ПРОИЗВОДСТВЕННЫХ ЗДАНИЙ И СООРУЖЕНИЙ&#13;
+Порядок проведения&#13;
+УТВЕРЖДЕН И ВВЕДЕН В ДЕЙСТВИЕ приказом Министерства архитектуры и&#13;
+строительства Республики Беларусь от 17 сентября 2007 г. № 286&#13;
+Дата введения 2008-04-01&#13;
+&#13;
+N01    (Л1 п.155)&#13;
+{Рисунок\20_DSCN6977.JPG}&#13;
+Укажите, чем из перечисленного ниже должны быть обеспечены работающие до&#13;
+начала выполнения лесоустроительных работ, работ по отводу и таксации лесосек в&#13;
+полевых условиях?&#13;
+1. Всем, что указано в других вариантах ответа.&#13;
+2. Полевым снаряжением.&#13;
+3. Аптечками первой помощи универсальными с набором необходимых&#13;
+лекарственных средств и изделий медицинского назначения.&#13;
+4. Средствами ориентирования в лесу.&#13;
+&#13;
+N02    (Л1 п.156)&#13;
+{Рисунок\Авторскитй.jpg}&#13;
+С чем должны быть ознакомлены работающие до начала выполнения&#13;
+лесоустроительных работ, работ по отводу и таксации лесосек?&#13;
+1. Со всем, что указано в других вариантах ответа.&#13;
+2. С безопасными методами и приемами лесоустроительных работ, работ&#13;
+по отводу и таксации лесосек в районе их выполнения.&#13;
+3. С мерами предосторожности от ядовитой ФЛОРЫ.&#13;
+4. С мерами предосторожности от ядовитой фауны.&#13;
+&#13;
+N03   (Л2 п. 5.3)&#13;
+Сколько технических паспортов составляется на производственные здания,&#13;
+эксплуатируемые в одной организации?&#13;
+1. По количеству зданий, сданных в эксплуатацию.&#13;
+2. Один паспорт на все здания данной организации.&#13;
+3. По количеству зданий, находящихся на балансе организации, включая&#13;
+здания, не сданные в эксплуатацию.&#13;
+4. По количеству зданий, в которых размещено основное производство.
+"/>
+    </Grid>
+</Window>
