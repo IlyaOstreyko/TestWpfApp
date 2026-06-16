@@ -23,6 +23,8 @@ using Binding = System.Windows.Data.Binding;
 using System.Windows.Threading;
 using TestWpfApp.Models;
 using TestWpfApp.Views;
+using Xceed.Wpf.AvalonDock.Themes;
+using TestWpfApp.Data.DataModels;
 
 namespace TestWpfApp.ViewModels
 {
@@ -36,7 +38,7 @@ namespace TestWpfApp.ViewModels
         public ICommand CloseWindowsCommand { get; }
         public ImageSource Image { get; private set; }
 
-        private TestQuestion testQuestion;
+        private TestQuestionVM testQuestion;
         private UserInfo UserInfo;
         private Answers answers;
         public bool VisibilityNameSpeciality { get; private set; } = false;
@@ -68,9 +70,9 @@ namespace TestWpfApp.ViewModels
             }
         }
         private List<Result> Results;
-        public List<TestQuestion> TestQuestions { get; set; }
+        public List<TestQuestionVM> TestQuestions { get; set; }        
 
-        public TestQuestion TestQuestion
+        public TestQuestionVM TestQuestion
         {
             get => testQuestion;
             set
@@ -80,7 +82,16 @@ namespace TestWpfApp.ViewModels
                 RaisePropertyChanged(nameof(TestQuestion));
             }
         }
-
+        private byte[] imageBytes { get; set; }
+        public byte[] ImageBytes
+        {
+            get => imageBytes;
+            set
+            {
+                imageBytes = value;
+                RaisePropertyChanged(nameof(ImageBytes));
+            }
+        }
         public int QuantityQuestion
         {
             get => quantityQuestion;
@@ -171,24 +182,7 @@ namespace TestWpfApp.ViewModels
             }
         }
 
-        public ShowQuestionViewModel(TestQuestion question)
-        {
-            CloseWindowsCommand = new RelayCommand(CloseWindows);
-            NextQuestionCommand = new RelayCommand(NextQuestion);
-            //SaveQuestionCommand = new RelayCommand(SaveQuestion);
-            //AddImageCommand = new RelayCommand(AddImage);
-            //Image = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-            question.ImageQuestion = "icon_2.jpg";
-            //if (question.ImageQuestion == null)
-            //{
-            //    question.ImageQuestion = "icon_2.jpg";
-            //}
-            Image = new BitmapImage(new Uri("pack://application:,,,/" + question.ImageQuestion));
-            RaisePropertyChanged("Image");
-            TestQuestion = question;
-        }
-
-        public ShowQuestionViewModel(List<TestQuestion> questions, UserInfo userInfo, List<Result> results, bool isTest)
+        public ShowQuestionViewModel(List<TestQuestionVM> questions, UserInfo userInfo, List<Result> results, bool isTest)
         {
             
             isRunning = true;
@@ -209,13 +203,17 @@ namespace TestWpfApp.ViewModels
                 TestQuestions[i].Status = false;
             }
             UserInfo = userInfo;
-            TimeLeft = TimeSpan.FromSeconds(UserInfo.Time * 60); // Начальное время
-            timer = new DispatcherTimer
+            if (!isTest)
             {
-                Interval = TimeSpan.FromSeconds(1)
-            };
-            timer.Tick += TimerTick;
-            timer.Start();
+                TimeLeft = TimeSpan.FromSeconds(UserInfo.Time * 60); // Начальное время
+                timer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(1)
+                };
+                timer.Tick += TimerTick;
+                timer.Start();
+            }
+            else            {                VisibilityTime = false;            }
 
             TestQuestion = TestQuestions[NumberQuestion - 1];
 
@@ -230,23 +228,7 @@ namespace TestWpfApp.ViewModels
                 NameAnswer4 = RndAnswers[3]
             };
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            string currentDirectory = Directory.GetCurrentDirectory();
-
-            string linkImage;
-            if (TestQuestion.ImageQuestion == null)
-            {
-                linkImage = currentDirectory + @"\images\icon_2.jpg";
-                //TestQuestion.ImageQuestion = currentDirectory + @"\images\icon_2.jpg";
-            }
-            else
-            {
-                linkImage = TestQuestion.FullImageQuestion;
-                //TestQuestion.ImageQuestion = currentDirectory + @"\" + TestQuestion.ImageQuestion;
-            }
-            //Uri link = new Uri(TestQuestion.ImageQuestion);
-            Uri link = new Uri(linkImage);
-            Image = new BitmapImage(link);
+            LoadImageByteForQuestion(TestQuestion);
             if (TestQuestion.NameSpeciality != null)
             {
                 VisibilityNameSpeciality = true;
@@ -257,31 +239,22 @@ namespace TestWpfApp.ViewModels
 
         private void TimerTick(object sender, EventArgs e)
         {
-            if (VisibilityTest)
+            if (TimeLeft.TotalSeconds > 0)
             {
-                VisibilityTime = false;
-                RaisePropertyChanged("VisibilityTime");
+                TimeLeft = TimeLeft.Subtract(TimeSpan.FromSeconds(1));
             }
             else
             {
-                if (TimeLeft.TotalSeconds > 0)
-                {
-                    TimeLeft = TimeLeft.Subtract(TimeSpan.FromSeconds(1));
-                }
-                else
-                {
-                    timer.Stop();
-                    isRunning = false;
-                    TimeOver = false;
-                    System.Windows.MessageBox.Show(
-                        "Установленное время теста истекло.",
-                        "Время вышло!",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning
-                    );
-                }
+                timer.Stop();
+                isRunning = false;
+                TimeOver = false;
+                System.Windows.MessageBox.Show(
+                    "Установленное время теста истекло.",
+                    "Время вышло!",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
             }
-
         }
 
         private void SkipQuestion(object obj)
@@ -324,6 +297,8 @@ namespace TestWpfApp.ViewModels
 
             if (!LoadNextUnansweredQuestion(TestQuestion.NumberInList))
             {
+                if (VisibilityTime && isRunning) 
+                { timer.Stop(); }                
                 System.Windows.MessageBox.Show($"Вы ответили правильно на {mark} вопросов.", "Результат теста",
                     MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -372,7 +347,7 @@ namespace TestWpfApp.ViewModels
             };
 
             // Загружаем картинку
-            LoadImageForQuestion(TestQuestion);
+            LoadImageByteForQuestion(TestQuestion);
 
             // Сбрасываем ответы
             ResetAnswers();
@@ -385,7 +360,27 @@ namespace TestWpfApp.ViewModels
             return true;
         }
 
-        private void LoadImageForQuestion(TestQuestion question)
+        private void LoadImageByteForQuestion(TestQuestionVM question)
+        {
+            string currentDirectory = Directory.GetCurrentDirectory();
+            if (TestQuestion.ImageQuestionBytes.Length == 0)
+            {
+                try
+                {
+                    string linkImage = Path.Combine(currentDirectory, "images", "icon_2.jpg");
+                    ImageBytes = File.ReadAllBytes(linkImage);
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"Путь базовой картинки некорректен\n{ ex.Message}","Ошибка",MessageBoxButton.OK,MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                ImageBytes = TestQuestion.ImageQuestionBytes;
+            }
+        }
+        private void LoadImageForQuestion(TestQuestionVM question)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             string currentDirectory = Directory.GetCurrentDirectory();

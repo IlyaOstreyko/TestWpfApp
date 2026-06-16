@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TestWpfApp.Views"
+        xmlns:views="clr-namespace:TestWpfApp.Views"
+        xmlns:converters="clr-namespace:TestWpfApp.Converters"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         AllowsTransparency="True"
@@ -11,7 +12,8 @@
         WindowState ="Maximized"
         Title="{Binding Title}" Height="900" Width="850">
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
     </Window.Resources>
     <Window.Template>
         <ControlTemplate TargetType="Window">
@@ -180,10 +182,12 @@
                 <ListBox.ItemTemplate >
                     <DataTemplate>
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                            <Image Source="{Binding FullImageQuestion, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                   AllowDrop="True" 
-                                   Width="450"
-                                   HorizontalAlignment="Left"/>
+                            <Image 
+                                   MaxHeight="250"
+       HorizontalAlignment="Center"
+       Stretch="Uniform"
+       Margin="0,0,0,10"
+       Source="{Binding ImageQuestionBytes, Converter={StaticResource ByteArrayToImageConverter}}"/>
                             <TextBlock Text="{Binding NameQuestion, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="1. " Foreground="Green"/>
@@ -202,6 +206,34 @@
                                 <TextBlock Text="{Binding NameAnswerIncorrect3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Red"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
+                                <Button
+    Command="{Binding DataContext.ChangeImageCommand,
+              RelativeSource={RelativeSource AncestorType=Window}}"
+    CommandParameter="{Binding}"
+    Width="220"
+    Height="25"
+    Margin="10"
+                                    Visibility="{Binding DataContext.VisibilityManager, RelativeSource={RelativeSource AncestorType=Window, AncestorLevel=1}, Converter={StaticResource BoolToVisibilityConverter}}">
+
+                                    <Button.Style>
+                                        <Style TargetType="Button"
+                                               BasedOn="{StaticResource crud_button_template}">
+
+                                            <Setter Property="Content"
+                    Value=" Добавить изображение "/>
+
+                                            <Style.Triggers>
+
+                                                <DataTrigger Binding="{Binding HasImage}"
+                             Value="True">
+                                                    <Setter Property="Content"
+                            Value=" Изменить изображение "/>
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                                 <Button IsDefault="False" 
                                 Command="{Binding DataContext.DeleteCommand,RelativeSource={RelativeSource AncestorType=Window, AncestorLevel=1}}"                                
                                     CommandParameter="{Binding}"
@@ -232,6 +264,16 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </ScrollViewer>
+        <Button IsDefault="False"
+        Command="{Binding DataContext.SaveWordCommand,
+                          RelativeSource={RelativeSource AncestorType=Window}}"
+        CommandParameter="{Binding}"
+        Style="{StaticResource crud_button_template}" 
+        Content=" Сохранить тему в WORD " 
+        Grid.Column="1"
+        Grid.Row="3"
+        Margin="5"
+        HorizontalAlignment="Center"/>
         <Button IsCancel="True"
                 IsDefault="False"
                 Style="{StaticResource close_button_template}" 

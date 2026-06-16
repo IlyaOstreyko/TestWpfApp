@@ -21,18 +21,9 @@ namespace TestWpfApp.Views
     /// </summary>
     public partial class ShowQuestion : Window
     {
-        public TestQuestion TestQuestion { get; set; }
-        public List<TestQuestion> TestQuestions { get; set; }
-        public ShowQuestion(TestQuestion testQuestion)
-        {
-            //InitializeComponent();
-            TestQuestion = testQuestion;
-            //DataContext = TestQuestion;
-
-            InitializeComponent();
-            DataContext = new ShowQuestionViewModel(TestQuestion);
-        }
-        public ShowQuestion(List<TestQuestion> testQuestions, UserInfo userInfo, List<Result> results)
+        public TestQuestionVM TestQuestion { get; set; }
+        public List<TestQuestionVM> TestQuestions { get; set; }
+        public ShowQuestion(List<TestQuestionVM> testQuestions, UserInfo userInfo, List<Result> results)
         {
             //InitializeComponent();
             //DataContext = TestQuestion;
@@ -40,7 +31,7 @@ namespace TestWpfApp.Views
             InitializeComponent();
             DataContext = new ShowQuestionViewModel(testQuestions, userInfo, results, isTest);
         }
-        public ShowQuestion(List<TestQuestion> testQuestions, bool isTest, List<Result> results)
+        public ShowQuestion(List<TestQuestionVM> testQuestions, bool isTest, List<Result> results)
         {
             //InitializeComponent();
             //DataContext = TestQuestion;

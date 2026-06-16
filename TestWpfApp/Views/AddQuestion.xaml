@@ -133,14 +133,36 @@
                  AcceptsReturn="True"
                  Text="{Binding TestQuestion.NameQuestion}"         
                  Grid.Row="0" Grid.Column="2"/>
-        <TextBox x:Name="Name_SpecialityTextBox" 
+        <!--<TextBox x:Name="Name_SpecialityTextBox" 
                  Text="{Binding TestQuestion.NameSpeciality}"   
                  Margin="10,8,15,8"
                  AcceptsReturn="True"
-                 Grid.Row="1" Grid.Column="2"/>
-
-        <Grid      
-            
+                 Grid.Row="1" Grid.Column="2"/>-->
+        <Grid                  
+            Grid.Row="1" 
+            Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="140"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox
+                Grid.Column="0"
+                Margin="10,8,5,8"
+                Name="deviceSelector2"
+                ItemsSource="{Binding Path=Specialities, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                SelectedItem="{Binding Path=SelectionSpeciality, UpdateSourceTrigger=PropertyChanged}">
+            </ComboBox>
+            <Button
+                Margin="5,8,15,8"
+                Grid.Column="1"
+                IsDefault="False"                 
+                    Command="{Binding ClearSpecialityCommand}" 
+                    Style="{StaticResource crud_button_template}"
+                    Content="  ✕ "                    
+                    HorizontalAlignment="Stretch">
+            </Button>
+        </Grid>
+        <Grid                  
             Grid.Row="2" 
             Grid.Column="2">
             <Grid.ColumnDefinitions>
@@ -156,7 +178,7 @@
             </ComboBox>
             <Button
                 Margin="5,8,15,8"
-                Grid.Column="1"
+                Grid.Column="2"
                 IsDefault="False"                 
                     Command="{Binding AddNewThemeCommand}" 
                     Style="{StaticResource crud_button_template}"
@@ -164,10 +186,6 @@
                     HorizontalAlignment="Stretch">
             </Button>
         </Grid>
-
-
-
-
         <TextBox x:Name="Name_ArticleTextBox"
                  Margin="10,8,15,8"
                  AcceptsReturn="True"

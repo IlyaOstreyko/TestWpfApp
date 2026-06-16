@@ -21,10 +21,10 @@ namespace TestWpfApp.Views
     /// </summary>
     public partial class User : Window
     {
-        public User(List<TestQuestion> questions, List<Result> results)
+        public User(List<TestQuestionVM> questions, List<Result> results, string speciality)
         {
             InitializeComponent();
-            DataContext = new UserViewModel(questions, results);
+            DataContext = new UserViewModel(questions, results, speciality);
         }
         private void PortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {

@@ -8,10 +8,12 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>main.ico</ApplicationIcon>
 	  <NoWarn>NU1903</NoWarn>
+	  <SelfContained>true</SelfContained>
+	  <PublishSingleFile>true</PublishSingleFile>
+	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="DOC.doc" />
     <None Remove="icon_2.jpg" />
     <None Remove="main.ico" />
     <None Remove="main.jpg" />
@@ -22,9 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="DOC.doc">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="icon_2.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
@@ -39,6 +38,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.14">
       <PrivateAssets>all</PrivateAssets>
@@ -57,6 +57,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TestWpfApp.Data\TestWpfApp.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Templates\" />
   </ItemGroup>
 
 </Project>

@@ -27,14 +27,14 @@ namespace TestWpfApp.Data.Repositories
             //_mapper = new Mapper(config);
         }
 
-        public void Create(TestQuestionDataModel item)
+        public void Create(TestQuestion item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
             try
             {
-                _context.TestQuestionDataModels.Add(item);
+                _context.TestQuestions.Add(item);
             }
             catch (Exception ex)
             {
@@ -50,13 +50,13 @@ namespace TestWpfApp.Data.Repositories
         //    itemQuestion.QuestionId = (int)testQuestionDM.QuestionId;
         //    //int returnValue = (int)this.ad.InsertCommand.ExecuteScalar();
         //}
-        public int Create(List<TestQuestionDataModel> questions)
+        public int Create(List<TestQuestion> questions)
         {
             if (questions == null) throw new ArgumentNullException(nameof(questions));
             int countQuestions = 0;
             try
             {
-                _context.TestQuestionDataModels.AddRange(questions);
+                _context.TestQuestions.AddRange(questions);
                 countQuestions = questions.Count();
             }
             catch (Exception ex)
@@ -71,9 +71,9 @@ namespace TestWpfApp.Data.Repositories
         {
             try
             {
-                var entity = _context.TestQuestionDataModels.Find(id);
+                var entity = _context.TestQuestions.Find(id);
                 if (entity != null)
-                    _context.TestQuestionDataModels.Remove(entity);
+                    _context.TestQuestions.Remove(entity);
             }
             catch (Exception ex)
             {
@@ -81,14 +81,19 @@ namespace TestWpfApp.Data.Repositories
                 throw;
             }
         }
-
-        public TestQuestionDataModel Get(int id)
+        public TestQuestion? GetTracked(int id)
         {
-            TestQuestionDataModel? testQuestion = new TestQuestionDataModel();
+            return _context.TestQuestions
+                .FirstOrDefault(x => x.QuestionId == id);
+        }
+        public TestQuestion Get(int id)
+        {
+            TestQuestion? testQuestion = new TestQuestion();
             try
             {
-                TestQuestionDataModel? questionDM =  _context.TestQuestionDataModels.AsNoTracking().FirstOrDefault(x => x.QuestionId == id);
-                if (questionDM == null)
+                //TestQuestion? questionDM =  _context.TestQuestions.AsNoTracking().FirstOrDefault(x => x.QuestionId == id);
+                TestQuestion? questionDM = _context.TestQuestions.FirstOrDefault(x => x.QuestionId == id);
+                if (questionDM != null)
                 {
                     testQuestion = questionDM;
                 }
@@ -101,12 +106,12 @@ namespace TestWpfApp.Data.Repositories
             return testQuestion;
         }
 
-        public List<TestQuestionDataModel> GetAll()
+        public List<TestQuestion> GetAll()
         {
-            List<TestQuestionDataModel> testQuestions = new List<TestQuestionDataModel>();
+            List<TestQuestion> testQuestions = new List<TestQuestion>();
             try
             {
-                List<TestQuestionDataModel> questionsDM =  _context.TestQuestionDataModels.AsNoTracking().ToList();
+                List<TestQuestion> questionsDM =  _context.TestQuestions.AsNoTracking().ToList();
                 if (questionsDM is null)
                 {
                     return testQuestions;
@@ -121,12 +126,12 @@ namespace TestWpfApp.Data.Repositories
             return testQuestions;
         }
 
-        public List<TestQuestionDataModel> GetQuestionsInTheme(string nameTheme)
+        public List<TestQuestion> GetQuestionsInTheme(string nameTheme)
         {
-            List<TestQuestionDataModel> testQuestions = new List<TestQuestionDataModel>();
+            List<TestQuestion> testQuestions = new List<TestQuestion>();
             try
             {
-                IQueryable<TestQuestionDataModel> query = _context.TestQuestionDataModels.AsNoTracking();
+                IQueryable<TestQuestion> query = _context.TestQuestions.AsNoTracking();
                 query = query.Where(u => u.NameTheme == nameTheme);
                 testQuestions = query.ToList();
             }
@@ -138,12 +143,12 @@ namespace TestWpfApp.Data.Repositories
             return testQuestions;
         }
 
-        public List<TestQuestionDataModel> GetRndQuestionsInTheme(string nameTheme, int number)
+        public List<TestQuestion> GetRndQuestionsInTheme(string nameTheme, int number)
         {
-            List<TestQuestionDataModel> testQuestions = new List<TestQuestionDataModel>();
+            List<TestQuestion> testQuestions = new List<TestQuestion>();
             try
             {
-                IQueryable<TestQuestionDataModel> query = _context.TestQuestionDataModels.AsNoTracking();
+                IQueryable<TestQuestion> query = _context.TestQuestions.AsNoTracking();
                 query = query.Where(u => u.NameTheme == nameTheme).OrderBy(_ => EF.Functions.Random()).Take(number);
                 testQuestions = query.ToList();
             }
@@ -154,28 +159,12 @@ namespace TestWpfApp.Data.Repositories
             }
             return testQuestions;
         }
-
-        #region randomShafle
-        private Random rng = new Random();
-        public void Shuffle<T>(IList<T> list)
-        {
-            int n = list.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
-        #endregion
         public bool CheckQuestionsOnNameQuestion(string nameQuestion)
         {
             if (string.IsNullOrWhiteSpace(nameQuestion)) return false;
             try
             {
-                return _context.TestQuestionDataModels
+                return _context.TestQuestions
                 .AsNoTracking()
                     .Any(q => q.NameQuestion == nameQuestion);
             }
@@ -185,12 +174,12 @@ namespace TestWpfApp.Data.Repositories
                 throw;
             }
         }
-        public bool CheckQuestions(TestQuestionDataModel question)
+        public bool CheckQuestions(TestQuestion question)
         {
             if (question == null) throw new ArgumentNullException(nameof(question));
             try
             {
-                return _context.TestQuestionDataModels.AsNoTracking().Any(u =>
+                return _context.TestQuestions.AsNoTracking().Any(u =>
             u.NameQuestion == question.NameQuestion &&
             u.NameTheme == question.NameTheme &&
             u.ImageQuestion == question.ImageQuestion &&
@@ -206,12 +195,12 @@ namespace TestWpfApp.Data.Repositories
             }
         }
 
-        public int? GetIdQuestions(TestQuestionDataModel question)
+        public int? GetIdQuestions(TestQuestion question)
         {
             if (question == null) throw new ArgumentNullException(nameof(question));
             try
             {
-                var questionInBase = _context.TestQuestionDataModels.AsNoTracking().FirstOrDefault(u =>
+                var questionInBase = _context.TestQuestions.AsNoTracking().FirstOrDefault(u =>
                 u.NameQuestion == question.NameQuestion &&
                 u.NameTheme == question.NameTheme &&
                 u.NameAnswerCorrect1 == question.NameAnswerCorrect1 &&
@@ -231,15 +220,15 @@ namespace TestWpfApp.Data.Repositories
             }
         }
 
-        public TestQuestionDataModel GetQuestionsOnNameQuestion(string nameQuestion)
+        public TestQuestion GetQuestionsOnNameQuestion(string nameQuestion)
         {
-            if (string.IsNullOrWhiteSpace(nameQuestion)) return new TestQuestionDataModel();            
+            if (string.IsNullOrWhiteSpace(nameQuestion)) return new TestQuestion();            
             try
             {
-                var questionDM = _context.TestQuestionDataModels.AsNoTracking().FirstOrDefault(u => u.NameQuestion == nameQuestion);
+                var questionDM = _context.TestQuestions.AsNoTracking().FirstOrDefault(u => u.NameQuestion == nameQuestion);
                 if (questionDM is null)
                 {
-                    return new TestQuestionDataModel();
+                    return new TestQuestion();
                 }
                 return questionDM;
             }
@@ -255,7 +244,7 @@ namespace TestWpfApp.Data.Repositories
             if (string.IsNullOrWhiteSpace(nameSpeciality)) return new List<string>();
             try
             {
-                var themes = _context.TestQuestionDataModels.AsNoTracking().Where(u => u.NameSpeciality == nameSpeciality).Select(n => n.NameTheme).Distinct().ToList();
+                var themes = _context.TestQuestions.AsNoTracking().Where(u => u.NameSpeciality == nameSpeciality).Select(n => n.NameTheme).Distinct().ToList();
                 if (themes is null)
                 {
                     return new List<string>();
@@ -274,7 +263,7 @@ namespace TestWpfApp.Data.Repositories
             var themes = new List<string>();
             try
             {
-                themes = _context.TestQuestionDataModels.AsNoTracking().Select(n => n.NameTheme).Distinct().ToList();
+                themes = _context.TestQuestions.AsNoTracking().Select(n => n.NameTheme).Distinct().ToList();
                 if (themes is null)
                 {
                     return new List<string>();
@@ -288,12 +277,12 @@ namespace TestWpfApp.Data.Repositories
             }
         }
 
-        public void Update(TestQuestionDataModel question)
+        public void Update(TestQuestion question)
         {
             if (question == null) throw new ArgumentNullException(nameof(question));
             try
             {
-                _context.TestQuestionDataModels.Update(question);
+                _context.TestQuestions.Update(question);
             }
             catch (Exception ex)
             {
@@ -306,7 +295,7 @@ namespace TestWpfApp.Data.Repositories
         {
             try
             {
-                return _context.TestQuestionDataModels
+                return _context.TestQuestions
                     .Count(q => q.NameTheme == nameTheme);
             }
             catch (Exception ex)

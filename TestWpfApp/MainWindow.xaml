@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:TestWpfApp"
         mc:Ignorable="d"
         Title=" Тестирование сотрудников " 
-        Height="450" 
-        Width="950"
+        Height="500" 
+        Width="1050"
         WindowStyle="None"     
         AllowsTransparency="True" 
         WindowStartupLocation="CenterScreen">
@@ -110,7 +110,7 @@
             </Button>
             <Label  
                    Margin="10,0,10,5"
-                   Content=" ver 1.7 (19/11/2025) "  
+                   Content=" ver 2.5 (16/06/2026) "  
                    Visibility="{Binding VisibilityPass, Converter={StaticResource BoolToVisibilityConverter}}"
                    HorizontalAlignment="Center" 
                 VerticalAlignment="Center"
@@ -120,22 +120,97 @@
                    Opacity="0.5" 
                    FontWeight="Bold"/>
         </StackPanel>
-        <StackPanel Grid.Row="0" 
-                    Orientation="Vertical"  
-                    HorizontalAlignment="Left">
+        <StackPanel Grid.Row="0"                     
+            Orientation="Vertical"  
+            HorizontalAlignment="Left">
+            <!-- Кнопка "Группы" (Видна только АДМИНУ) -->
             <Button Margin="10,10,10,5" 
-                    Padding="10"
-                    Command="{Binding SpecialitiesCommand}" 
-                    Visibility="{Binding Visibility, Converter={StaticResource BoolToVisibilityConverter}}"
-                    Style="{StaticResource crud_button_template}">
-                <StackPanel Orientation="Horizontal" 
-                                VerticalAlignment="Center">
-                    <TextBlock Text=" Специальности " 
-                               Margin="5,0,10,0"
-                                   VerticalAlignment="Center" 
-                                   FontSize="16"/>
-                </StackPanel>
+            Padding="10"
+            Command="{Binding GroupsCommand}" 
+            Visibility="{Binding Visibility, Converter={StaticResource BoolToVisibilityConverter}}"
+            Style="{StaticResource crud_button_template}">
+                <TextBlock Text=" Группы " FontSize="16"/>
             </Button>
+            <!-- Кнопка "Специальности" (Видна только АДМИНУ) -->
+            <Button Margin="10,10,10,5" 
+            Padding="10"
+            Command="{Binding SpecialitiesCommand}" 
+            Visibility="{Binding Visibility, Converter={StaticResource BoolToVisibilityConverter}}"
+            Style="{StaticResource crud_button_template}">
+                <TextBlock Text=" Специальности " FontSize="16"/>
+            </Button>
+            <!-- Блок выбора для ПОЛЬЗОВАТЕЛЯ (Виден, когда Visibility == False) -->
+            <Border HorizontalAlignment="Right"
+                    Width="330"
+                    Margin="10"
+                    Padding="15"
+                    Background="#66000000"
+                    CornerRadius="10"
+                    >
+
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap"
+                   Foreground="White"
+                   FontSize="13"
+                   Margin="0,0,0,15">
+                        Для удобного поиска сначала выберите группу специальностей.
+                        После выбора группы список специальностей будет автоматически отфильтрован.
+                        Если группа не выбрана — отображаются специальности,
+                        не относящиеся ни к одной группе.
+                    </TextBlock>
+                    <!-- ГРУППА -->
+                    <TextBlock Text="Выберите группу:" 
+                               Foreground="White" 
+                               FontWeight="SemiBold" 
+                               Margin="0,0,0,5"/>
+                    <ComboBox x:Name="GroupCombo"
+                              Width="300" 
+                              Height="35" 
+                              FontSize="16"
+                              ItemsSource="{Binding Groups}"
+                              SelectedItem="{Binding SelectedGroup}"
+                              DisplayMemberPath="Name"
+                              IsEditable="True"
+                              IsTextSearchEnabled="True"
+                              TextSearch.TextPath="Name"
+                              StaysOpenOnEdit="True"
+                              MaxDropDownHeight="300">
+
+                        <ComboBox.Resources>
+                            <Style TargetType="ScrollViewer">
+                                <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+                                <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+                                <Setter Property="CanContentScroll" Value="True"/>
+                            </Style>
+                        </ComboBox.Resources>
+
+                    </ComboBox>
+                    <!-- СПЕЦИАЛЬНОСТЬ -->
+                    <TextBlock Text="Выберите специальность:" 
+                               Foreground="White" 
+                               FontWeight="SemiBold" 
+                               Margin="0,0,0,5"/>
+                    <ComboBox Width="300" Height="35" FontSize="16"
+                              HorizontalAlignment="Center"
+                              ItemsSource="{Binding FilteredSpecialities}"
+                              SelectedItem="{Binding SelectedSpeciality}"
+                              DisplayMemberPath="Name"
+                              IsEditable="True"
+                              IsTextSearchEnabled="True"
+                              TextSearch.TextPath="Name"
+                              StaysOpenOnEdit="True"
+                              MaxDropDownHeight="300">
+                        <ComboBox.Resources>
+                            <Style TargetType="ScrollViewer">
+                                <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+                                <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+                                <Setter Property="CanContentScroll" Value="True"/>
+                            </Style>
+                        </ComboBox.Resources>
+
+                    </ComboBox>
+                </StackPanel>
+            </Border>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -185,8 +260,8 @@
                 </Button>
                 <Button
                     Margin ="10"  
-                    Command="{Binding Start}">
-                    <TextBlock Text=" Выбрать тему и начать тест "
+                    Command="{Binding StartCommand}">
+                    <TextBlock Text=" Начать тест "
                            TextAlignment="Justify" 
                            VerticalAlignment="Stretch"/>
                     <Button.Style>
@@ -217,6 +292,5 @@
                            TextAlignment="Justify" />
             </Button>
         </Grid>
-
     </Grid>
 </Window>

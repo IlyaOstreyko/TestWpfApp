@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TestWpfApp.Views"
+        xmlns:converters="clr-namespace:TestWpfApp.Converters"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         AllowsTransparency="True"
@@ -12,6 +13,7 @@
         Title=" Результаты тестирования " Height="900" Width="800">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
     </Window.Resources>
     <Window.Template>
         <ControlTemplate TargetType="Window">
@@ -112,9 +114,9 @@
                 <ListBox.ItemTemplate >
                     <DataTemplate>
                         <StackPanel Orientation="Vertical">
-                            <Image Source="{Binding FullImageQuestion}" 
+                            <Image Source="{Binding ImageQuestionBytes, Converter={StaticResource ByteArrayToImageConverter}}"
                                    Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" 
-                                   Width="450"
+                                   MaxHeight="250"
                                    HorizontalAlignment="Left"/>
                             <TextBlock Text="{Binding NameQuestion}"/>
                             <StackPanel Orientation="Horizontal">
@@ -168,9 +170,9 @@
                 <ListBox.ItemTemplate >
                     <DataTemplate>
                         <StackPanel Orientation="Vertical">
-                            <Image Source="{Binding FullImageQuestion}" 
+                            <Image Source="{Binding ImageQuestionBytes, Converter={StaticResource ByteArrayToImageConverter}}"
                                    Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" 
-                                   Width="450"
+                                   MaxHeight="250"
                                    HorizontalAlignment="Left"/>
                             <TextBlock Text="{Binding NameQuestion}"/>
                             <StackPanel Orientation="Horizontal">

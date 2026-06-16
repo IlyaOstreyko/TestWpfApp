@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestWpfApp.Data.DataModels;
 using TestWpfApp.Models;
 
 namespace TestWpfApp.Interfaces
@@ -11,13 +12,14 @@ namespace TestWpfApp.Interfaces
     {
         // Базовые окна
         void ShowAddQuestion();
-        void ShowEditQuestions(bool isEdit);
+        void ShowEditQuestion(AddQuestionParameters parameters);
+        //void ShowEditQuestions(bool isEdit);
         void ShowThemes();
         string? ShowNewTheme();
         void CloseApplication();
         // Результаты теста
         void ShowResults(
-            List<TestQuestion> testQuestions,
+            List<TestQuestionVM> testQuestions,
             UserInfo userInfo,
             List<Result> results,
             bool isTest,
@@ -25,10 +27,10 @@ namespace TestWpfApp.Interfaces
         // Пример
         void ShowSample();
         // Просмотр/показ вопросов
-        void ShowQuestion(TestQuestion testQuestion);
-        void ShowQuestion(List<TestQuestion> testQuestions, UserInfo userInfo, List<Result> results);
-        void ShowQuestion(List<TestQuestion> testQuestions, bool isTest, List<Result> results);
+        //void ShowQuestion(TestQuestionVM testQuestion);
+        void ShowQuestion(List<TestQuestionVM> testQuestions, UserInfo userInfo, List<Result> results);
+        void ShowQuestion(List<TestQuestionVM> testQuestions, bool isTest, List<Result> results);
         // Окно пользователя
-        void ShowUser(List<TestQuestion> questions, List<Result> results);
+        void ShowUser(List<TestQuestionVM> questions, List<Result> results, string spec);
     }
 }

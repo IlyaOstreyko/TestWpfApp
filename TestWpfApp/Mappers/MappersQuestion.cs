@@ -20,7 +20,7 @@ namespace TestWpfApp.Mappers
         public MappersQuestion() 
         {
             string currentDirectory = Directory.GetCurrentDirectory();
-            CreateMap<TestQuestionDataModel, TestQuestion>().ForMember(
+            CreateMap<TestQuestion, TestQuestionVM>().ForMember(
                 dest => dest.FullImageQuestion, 
                 opt => opt.MapFrom(src => Path.Combine(currentDirectory, src.ImageQuestion))).ReverseMap(); 
         }

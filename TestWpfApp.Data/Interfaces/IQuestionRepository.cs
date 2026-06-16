@@ -9,20 +9,21 @@ namespace TestWpfApp.Data.Interfaces
 {
     public interface IQuestionRepository
     {
-        List<TestQuestionDataModel> GetAll();
-        List<TestQuestionDataModel> GetQuestionsInTheme(string nameTheme);
-        List<TestQuestionDataModel> GetRndQuestionsInTheme(string nameTheme, int number);
+        List<TestQuestion> GetAll();
+        List<TestQuestion> GetQuestionsInTheme(string nameTheme);
+        TestQuestion? GetTracked(int id);
+        List<TestQuestion> GetRndQuestionsInTheme(string nameTheme, int number);
         List<string> GetThemes();
         List<string> GetThemesInSpeciality(string nameSpeciality);
         int GetNumberQuestionInTheme(string nameTheme);
         bool CheckQuestionsOnNameQuestion(string nameQuestion);
-        bool CheckQuestions(TestQuestionDataModel question);
-        int? GetIdQuestions(TestQuestionDataModel question);
-        TestQuestionDataModel GetQuestionsOnNameQuestion(string nameQuestion);
-        TestQuestionDataModel Get(int id);
-        void Create(TestQuestionDataModel item);
-        int Create(List<TestQuestionDataModel> items);
-        void Update(TestQuestionDataModel item);
+        bool CheckQuestions(TestQuestion question);
+        int? GetIdQuestions(TestQuestion question);
+        TestQuestion GetQuestionsOnNameQuestion(string nameQuestion);
+        TestQuestion Get(int id);
+        void Create(TestQuestion item);
+        int Create(List<TestQuestion> items);
+        void Update(TestQuestion item);
         void Delete(int id);
     }
 }

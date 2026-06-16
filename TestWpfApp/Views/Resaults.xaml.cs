@@ -21,7 +21,7 @@ namespace TestWpfApp.Views
     /// </summary>
     public partial class Resaults : Window
     {
-        public Resaults(List<TestQuestion> testQuestions, UserInfo userInfo, List<Result> results, bool isTest, bool timeOver)
+        public Resaults(List<TestQuestionVM> testQuestions, UserInfo userInfo, List<Result> results, bool isTest, bool timeOver)
         {
             InitializeComponent();
             DataContext = new ResaultsViewModel(testQuestions, userInfo, results, isTest, timeOver);

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TestWpfApp.Views"
+        xmlns:converters="clr-namespace:TestWpfApp.Converters"
         mc:Ignorable="d"
         WindowStyle="None" 
         AllowsTransparency="True"
@@ -11,6 +12,7 @@
         Title=" Выберите ответ " WindowStartupLocation="CenterScreen" Width="800" Height="800">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
     </Window.Resources>
     <Window.Template>
         <ControlTemplate TargetType="Window">
@@ -85,7 +87,9 @@
                     Grid.Column="1"
                     Grid.Row="0"
                     Grid.RowSpan="4">
-            <Image Source="{Binding Image, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Image 
+                MaxHeight="300"
+                Source="{Binding ImageBytes, Converter={StaticResource ByteArrayToImageConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
             <StackPanel Orientation="Vertical" Margin="20">
                 <Label Content="Тема: " FontSize="15" />
                 <TextBlock Text="{Binding TestQuestion.NameTheme}" FontSize="20" TextWrapping="Wrap"/>

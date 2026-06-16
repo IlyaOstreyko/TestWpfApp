@@ -22,7 +22,6 @@ namespace TestWpfApp
             InitializeComponent();
             DataContext = vm;
         }
-
         private void Pass_PasswordChanged(object sender, RoutedEventArgs e)
         {
 

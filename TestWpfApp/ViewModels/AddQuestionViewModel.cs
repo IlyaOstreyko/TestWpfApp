@@ -23,257 +23,499 @@ using TestWpfApp.Views;
 using AutoMapper;
 using TestWpfApp.Interfaces;
 using TestWpfApp.Data.DataModels;
+using System.Collections.ObjectModel;
+using TestWpfApp.Data.UnitOfWork;
 
 namespace TestWpfApp.ViewModels
 {
     public class AddQuestionViewModel : INotifyPropertyChanged
     {
-        private readonly IDialogService _dialogService; 
+        private readonly IDialogService _dialogService;
         private readonly IWindowService _windowService;
-        private readonly IQuestionRepository _db; // Используем интерфейс
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly MigrationOldTableService _migrationService;
-        public OpenFileDialog openFileDialog;
+        private readonly QuestionFileImporter _questionFileImporter;
+
         public ICommand SaveQuestionCommand { get; }
-        public ICommand SaveEditQuestionCommand { get; }
         public ICommand AddImageCommand { get; }
         public ICommand DeleteImageCommand { get; }
         public ICommand AddQuestionFromFileCommand { get; }
         public ICommand FileCommand { get; }
-        public ICommand CloseWindowsCommand { get; }
         public ICommand AddNewThemeCommand { get; }
+        public ICommand AddNewSpecialityCommand { get; }
         public ICommand MigrateOldDatabaseCommand { get; }
-        public ImageSource Image { get; private set; }
-        public FileInfo? FileInf;
-        public string Title { get; set; }
-        public string TitleImageButton { get; set; } = " Добавить картинку ";
+        public ICommand ClearSpecialityCommand { get; }
+
+        private FileInfo? _fileInfo;
+
+        public string Title { get; set; } = string.Empty;
+
         public bool VisibilityEdit { get; set; }
-        public bool VisibilityDelete { get; set; }
-        public bool ImageEdit { get; set; } = false;
-        
+
         public bool VisibilityAdd { get; set; }
+
+        public bool VisibilityDelete { get; set; }
+
+        public bool VisibilityImportButtons { get; set; }
+
+        public bool ImageEdit { get; set; }
+
+        public string TitleImageButton { get; set; }
+            = " Добавить картинку ";
+
         public string? ImagePath { get; set; }
-        private ImageSource imageSource;
+
+        private ImageSource? _imageSource;
+
         public ImageSource? ImageSource
         {
-            get => imageSource;
+            get => _imageSource;
             set
             {
-                imageSource = value!;
-
+                _imageSource = value;
                 RaisePropertyChanged(nameof(ImageSource));
             }
         }
-        private System.Collections.ObjectModel.ObservableCollection<string> themes;
-        public System.Collections.ObjectModel.ObservableCollection<string> Themes
+
+        private ObservableCollection<string> _themes = new();
+
+        public ObservableCollection<string> Themes
         {
-            get => themes;
+            get => _themes;
             set
             {
-                themes = value;
-
+                _themes = value;
                 RaisePropertyChanged(nameof(Themes));
             }
         }
-        public string SelectionTheme { get; set; }
 
-        private TestQuestion testQuestion;
+        private string _selectionTheme = string.Empty;
 
-        public TestQuestion TestQuestion
+        public string SelectionTheme
         {
-            get => testQuestion;
+            get => _selectionTheme;
             set
             {
-                testQuestion = value;
+                _selectionTheme = value;
+                RaisePropertyChanged(nameof(SelectionTheme));
 
+            }
+        }
+        private ObservableCollection<string> _specialities = new();
+
+        public ObservableCollection<string> Specialities
+        {
+            get => _specialities;
+            set
+            {
+                _specialities = value;
+                RaisePropertyChanged(nameof(Specialities));
+                
+            }
+        }
+
+        private string _selectionSpeciality = string.Empty;
+
+        public string SelectionSpeciality
+        {
+            get => _selectionSpeciality;
+            set
+            {
+                _selectionSpeciality = value;
+                RaisePropertyChanged(nameof(SelectionSpeciality));
+                FilterThemes();
+            }
+        }
+        private TestQuestionVM _testQuestion = new();
+
+        public TestQuestionVM TestQuestion
+        {
+            get => _testQuestion;
+            set
+            {
+                _testQuestion = value;
                 RaisePropertyChanged(nameof(TestQuestion));
             }
         }
+
         private int _progressValue;
+
         public int ProgressValue
         {
             get => _progressValue;
             set
             {
                 _progressValue = value;
-                RaisePropertyChanged(nameof(ProgressValue)); // уведомляем UI
+                RaisePropertyChanged(nameof(ProgressValue));
             }
         }
-        IQuestionRepository db;
 
-        public AddQuestionViewModel(IDialogService dialogService, IWindowService windowService, IQuestionRepository db, IMapper mapper, MigrationOldTableService migrationService)
+        public AddQuestionViewModel(
+            IDialogService dialogService,
+            IWindowService windowService,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            MigrationOldTableService migrationService,
+            QuestionFileImporter questionFileImporter,
+            AddQuestionParameters? parameters = null)
         {
-            _dialogService = dialogService; 
+            _dialogService = dialogService;
             _windowService = windowService;
-            _db = db;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _migrationService = migrationService;
-            Title = " Добавление вопроса ";
-            VisibilityEdit = false;
-            VisibilityAdd = true;
-            VisibilityDelete = false;
-            //CloseWindowsCommand = new RelayCommand(CloseWindows);
-            AddNewThemeCommand = new RelayCommand(AddNewTheme);
+            _questionFileImporter = questionFileImporter;
+
             SaveQuestionCommand = new RelayCommand(SaveQuestion);
             AddImageCommand = new RelayCommand(AddImage);
             DeleteImageCommand = new RelayCommand(DeleteImage);
             AddQuestionFromFileCommand = new RelayCommand(AddQuestionFromFile);
             FileCommand = new RelayCommand(SampleFile);
-            MigrateOldDatabaseCommand = new RelayCommand(async (obj) => await MigrateOldDatabase());
-            TestQuestion = new TestQuestion();
-            //db = new QuestionRepository();
-            var ThemesList = _db.GetThemes();
-            Themes = new System.Collections.ObjectModel.ObservableCollection<string>();
-            foreach (var item in ThemesList)
-                Themes.Add(item);
-        }
-
-        public AddQuestionViewModel(TestQuestion questionEdit, IDialogService dialogService, IWindowService windowService, IQuestionRepository db, IMapper mapper)
-        {
-            _dialogService = dialogService;
-            _windowService = windowService;
-            _db = db;
-            _mapper = mapper;
-            Title = " Редактирование вопроса ";
-            VisibilityEdit = true;
-            VisibilityAdd = false;
-            //CloseWindowsCommand = new RelayCommand(CloseWindows);
-            SaveQuestionCommand = new RelayCommand(SaveQuestion);
-            AddImageCommand = new RelayCommand(AddImage);
-            DeleteImageCommand = new RelayCommand(DeleteImage);
             AddNewThemeCommand = new RelayCommand(AddNewTheme);
-            AddQuestionFromFileCommand = new RelayCommand(AddQuestionFromFile);
-            TestQuestion = questionEdit;
-            //db = new QuestionRepository();
-            var ThemesList = _db.GetThemes();
-            Themes = new System.Collections.ObjectModel.ObservableCollection<string>();
-            foreach (var item in ThemesList)
-                Themes.Add(item);
-            SelectionTheme = TestQuestion.NameTheme;
-            if (TestQuestion.ImageQuestion  != null)
+            ClearSpecialityCommand = new RelayCommand(_ => ClearSpeciality());
+            //AddNewSpecialityCommand = new RelayCommand(AddNewSpeciality);
+
+            MigrateOldDatabaseCommand =
+                new RelayCommand(async _ => await MigrateOldDatabase());
+            LoadSpecialities();
+            LoadThemes();
+
+            InitializeMode(parameters);
+        }
+
+        private void InitializeMode(
+            AddQuestionParameters? parameters)
+        {
+            bool isEditMode =
+                parameters?.Question != null &&
+                !string.IsNullOrWhiteSpace(
+                    parameters.Question.NameQuestion);
+
+            if (!isEditMode)
             {
-                ImagePath = TestQuestion.FullImageQuestion;
-
-                var bmp = new BitmapImage();
-                bmp.BeginInit();
-                bmp.UriSource = new Uri(ImagePath);
-                bmp.CacheOption = BitmapCacheOption.OnLoad; // ← ключ
-                bmp.EndInit();
-                bmp.Freeze(); // ← освобождает файл
-                ImageSource = bmp;
-
-                TitleImageButton = " Изменить картинку ";
-                VisibilityDelete = true;
+                InitializeCreateMode();
+                return;
             }
+
+            InitializeEditMode(parameters!);
         }
-        private async Task MigrateOldDatabase()
+
+        private void InitializeCreateMode()
         {
-            // 1. Просим пользователя выбрать файл старой базы данных
-            if (_dialogService.OpenFileDialog())
+            Title = " Добавление вопроса ";
+
+            VisibilityAdd = true;
+
+            VisibilityEdit = false;
+
+            VisibilityDelete = false;
+
+            VisibilityImportButtons = true;
+
+            TestQuestion = new TestQuestionVM();
+
+            RaiseAllProperties();
+        }
+
+        private void InitializeEditMode(
+            AddQuestionParameters parameters)
+        {
+            Title = " Редактирование вопроса ";
+
+            VisibilityAdd = false;
+
+            VisibilityEdit = true;
+
+            VisibilityImportButtons = false;
+
+            TestQuestion = parameters.Question!;
+
+            SelectionSpeciality =
+                parameters.SelectedSpeciality;
+
+            FilterThemes();
+
+            SelectionTheme =
+                parameters.SelectedTheme;
+
+            VisibilityDelete =
+                TestQuestion.ImageQuestionBytes?.Length > 0;
+
+            LoadImageFromBytes();
+
+            RaiseAllProperties();
+        }
+        private void ClearSpeciality()
+        {
+            SelectionSpeciality = null;
+        }
+        private void FilterThemes()
+        {
+            try
             {
-                string oldDbPath = _dialogService.FilePath;
-
-                try
+                // специальность НЕ выбрана
+                if (string.IsNullOrWhiteSpace(SelectionSpeciality))
                 {
-                    // Можно добавить индикацию начала процесса (например, курсор ожидания)
-                    Mouse.OverrideCursor = Cursors.Wait;
-
-                    await _migrationService.MigrateDataAsync(oldDbPath);
-
-                    // Обновляем список тем в UI после миграции, если появились новые
-                    var updatedThemes = _db.GetThemes();
-                    Themes.Clear();
-                    foreach (var theme in updatedThemes)
-                    {
-                        Themes.Add(theme);
-                    }
-
-                    _dialogService.ShowMessage("Данные успешно перенесены из старой базы.");
+                    LoadThemes();
                 }
-                catch (Exception ex)
+                // специальность выбрана
+                else
                 {
-                    _dialogService.ShowError($"Ошибка при миграции: {ex.Message}", "Ошибка миграции");
-                }
-                finally
-                {
-                    Mouse.OverrideCursor = null;
-                }
+                    List<string> themes;
+                    themes = _unitOfWork.Themes
+                        .GetAll()
+                        .Where(x =>
+                            x.Specialities.Any(s =>
+                                s.Name == SelectionSpeciality))
+                        .Select(x => x.Name)
+                        .Distinct()
+                        .OrderBy(x => x)
+                        .ToList();
+                    Themes = new ObservableCollection<string>(themes);
+                }                
             }
-        }
-        private void AddQuestionFromFile(object obj)
-        {
-            var importer = new QuestionFileImporter(db);
-            importer.AddQuestionsFromFile(_mapper);
-            //importer.ProgressChanged += percent =>
-            //{
-            //    ProgressValue = percent;
-            //};          
-        }
-
-        private void SampleFile(object obj)
-        {
-            _windowService.ShowSample();
-        }
-
-
-        private void AddNewTheme(object obj)
-        {
-            string? newTheme = _windowService.ShowNewTheme(); 
-            if (!string.IsNullOrWhiteSpace(newTheme)) 
-            { 
-                Themes.Add(newTheme); 
-                RaisePropertyChanged("Themes"); 
-            }
-        }
-
-
-        private void AddImage(object obj)
-        {
-            //openFileDialog = new OpenFileDialog()
-            //{
-            //    Multiselect = true,
-            //    Filter = "Image files (*.BMP, *.JPG, *.GIF, *.TIF, *.PNG, *.ICO, *.EMF, *.WMF)|*.bmp;*.jpg;*.gif; *.tif; *.png; *.ico; *.emf; *.wmf"
-            //};
-            if (_dialogService.OpenFileDialog()) 
-            { 
-                ImagePath = _dialogService.FilePath; 
-                var bmp = new BitmapImage(); 
-                bmp.BeginInit(); 
-                bmp.UriSource = new Uri(ImagePath); 
-                bmp.CacheOption = BitmapCacheOption.OnLoad; 
-                bmp.EndInit(); bmp.Freeze(); 
-                ImageSource = bmp; 
-
-                RaisePropertyChanged("ImageSource"); 
-                FileInf = new FileInfo(ImagePath); 
-                ImageEdit = true; 
-                TitleImageButton = " Изменить картинку "; 
-                RaisePropertyChanged("TitleImageButton"); 
-                VisibilityDelete = true; 
-                RaisePropertyChanged("VisibilityDelete"); 
-            }
-        }
-
-        private void DeleteImage(object obj)
-        {
-            ImagePath = null;
-            FileInf = null;
-            VisibilityDelete = false;            
-            TitleImageButton = " Добавить картинку ";
-            if (TestQuestion.ImageQuestion != null)
+            catch (Exception ex)
             {
-                ImageEdit = true;
+                _dialogService.ShowError(
+                    $"Ошибка фильтрации тем:\n{ex.Message}",
+                    "Ошибка");
+            }
+        }
+        private void LoadSpecialities()
+        {
+            try 
+            {
+                List<Speciality> specialities = _unitOfWork.Specialities.GetAll().ToList();
+                if (specialities.Count > 0)
+                {
+                    Specialities = new ObservableCollection<string>(
+                        specialities.Select(s => s.Name));
+                }
+            }
+            catch (Exception ex)
+            {
+                _dialogService.ShowError(
+                    $"Ошибка загрузки специальностей: {ex.Message}",
+                    "Ошибка");
+                return;
+            }
+        }
+        private void LoadThemes()
+        {
+            List<string> themes;
+            try
+            {                
+                themes = _unitOfWork.Themes
+    .GetAll()
+    .Where(x => !x.Specialities.Any())
+    .Select(x => x.Name)
+    .Distinct()
+    .OrderBy(x => x)
+    .ToList();
+            }
+            catch (Exception ex)
+            {
+                _dialogService.ShowError(
+                    $"Ошибка загрузки тем:\n{ex.Message}",
+                    "Ошибка");
+                return;
+            }
+            Themes = new ObservableCollection<string>(themes);
+        }
+
+        private void LoadImageFromBytes()
+        {
+            if (TestQuestion.ImageQuestionBytes == null ||
+                TestQuestion.ImageQuestionBytes.Length == 0)
+            {
+                ImageSource = null;
+                return;
             }
 
-            ImageSource = null;
+            using var ms =
+                new MemoryStream(TestQuestion.ImageQuestionBytes);
 
-            RaisePropertyChanged("ImageSource");
-            RaisePropertyChanged("VisibilityDelete");
-            RaisePropertyChanged("TitleImageButton");
+            var bitmap = new BitmapImage();
 
+            bitmap.BeginInit();
+
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+
+            bitmap.StreamSource = ms;
+
+            bitmap.EndInit();
+
+            bitmap.Freeze();
+
+            ImageSource = bitmap;
+
+            TitleImageButton = " Изменить картинку ";
+        }
+
+        private async void AddQuestionFromFile(object obj)
+        {
+            try
+            {
+                _questionFileImporter.ProgressChanged += OnProgressChanged;
+
+                _questionFileImporter.AddQuestionsFromFile();
+            }
+            catch (Exception ex)
+            {
+                _dialogService.ShowError(
+                    ex.Message,
+                    "Ошибка импорта");
+            }
+            finally
+            {
+                _questionFileImporter.ProgressChanged -=
+                    OnProgressChanged;
+            }
+        }
+
+        private void OnProgressChanged(int progress)
+        {
+            ProgressValue = progress;
         }
 
         private void SaveQuestion(object obj)
+        {
+            if (!ValidateQuestion())
+                return;
+
+            try
+            {
+                var theme = _unitOfWork.Themes
+                    .GetAll()
+                    .FirstOrDefault(x =>
+                        x.Name == SelectionTheme);
+
+                if (theme == null)
+                {
+                    _dialogService.ShowError(
+                        "Тема не найдена.",
+                        "Ошибка");
+
+                    return;
+                }
+
+                // =====================================================
+                // СОЗДАНИЕ
+                // =====================================================
+
+                if (VisibilityAdd)
+                {
+                    var newEntity =
+                        _mapper.Map<Data.DataModels.TestQuestion>(
+                            TestQuestion);
+
+                    newEntity.ThemeId = theme.ThemeId;
+                    newEntity.NameTheme = theme.Name;
+
+                    if (_fileInfo != null)
+                    {
+                        newEntity.ImageQuestionBytes =
+                            File.ReadAllBytes(_fileInfo.FullName);
+                    }
+
+                    bool exists =
+                        _unitOfWork.Questions.CheckQuestions(newEntity);
+
+                    if (exists)
+                    {
+                        _dialogService.ShowError(
+                            "Такой вопрос уже существует.",
+                            "Ошибка");
+
+                        return;
+                    }
+
+                    _unitOfWork.Questions.Create(newEntity);
+
+                    _unitOfWork.SaveAsync();
+
+                    TestQuestion.QuestionId =
+                        newEntity.QuestionId;
+                }
+
+                // =====================================================
+                // РЕДАКТИРОВАНИЕ
+                // =====================================================
+
+                else
+                {
+                    // Получаем TRACKED entity
+                    var entity =
+                        _unitOfWork.Questions
+                            .GetTracked((int)TestQuestion.QuestionId);
+
+                    if (entity == null)
+                    {
+                        _dialogService.ShowError(
+                            "Вопрос не найден.",
+                            "Ошибка");
+
+                        return;
+                    }
+
+                    // Обновляем поля вручную
+                    entity.NameQuestion =
+                        TestQuestion.NameQuestion;
+
+                    entity.NameAnswerCorrect1 =
+                        TestQuestion.NameAnswerCorrect1;
+
+                    entity.NameAnswerIncorrect1 =
+                        TestQuestion.NameAnswerIncorrect1;
+
+                    entity.NameAnswerIncorrect2 =
+                        TestQuestion.NameAnswerIncorrect2;
+
+                    entity.NameAnswerIncorrect3 =
+                        TestQuestion.NameAnswerIncorrect3;
+
+                    entity.NameArticle =
+                        TestQuestion.NameArticle;
+
+                    entity.ThemeId =
+                        theme.ThemeId;
+                    entity.NameTheme = theme.Name;
+
+
+                    if (ImageEdit)
+                    {
+                        if (_fileInfo != null)
+                        {
+                            entity.ImageQuestionBytes =
+                                File.ReadAllBytes(_fileInfo.FullName);
+                        }
+                        else
+                        {
+                            entity.ImageQuestionBytes = null;
+                        }
+                    }
+
+                    // Update НЕ НУЖЕН
+                    // entity уже tracked
+
+                    _unitOfWork.SaveAsync();
+                }
+
+                _dialogService.ShowMessage(
+                    VisibilityAdd
+                        ? "Вопрос успешно добавлен."
+                        : "Вопрос успешно изменён.");
+            }
+            catch (Exception ex)
+            {
+                _dialogService.ShowError(
+                    $"Ошибка сохранения:\n{ex.InnerException?.Message ?? ex.Message}",
+                    "Ошибка");
+            }
+        }
+
+        private bool ValidateQuestion()
         {
             if (string.IsNullOrWhiteSpace(TestQuestion.NameQuestion) ||
                 string.IsNullOrWhiteSpace(SelectionTheme) ||
@@ -282,193 +524,321 @@ namespace TestWpfApp.ViewModels
                 string.IsNullOrWhiteSpace(TestQuestion.NameAnswerIncorrect2) ||
                 string.IsNullOrWhiteSpace(TestQuestion.NameAnswerIncorrect3))
             {
-                _dialogService.ShowError("Заполните все поля(поля Сециальность и пояснение необязательные)).", "Ошибка заполнения формы"); 
-                return;
+                _dialogService.ShowError(
+                    "Заполните обязательные поля.",
+                    "Ошибка");
+
+                return false;
             }
 
-            //db = new QuestionRepository();
-            TestQuestion.NameTheme = SelectionTheme;
-            var dataModel = _mapper.Map<TestQuestionDataModel>(TestQuestion);
-            if (!db.CheckQuestions(dataModel) || ImageEdit)
-            {
-                // создание нового вопроса
-                if (VisibilityAdd)
-                {
-                    db.Create(dataModel);
-                    TestQuestion.QuestionId = dataModel.QuestionId;
-                    // добавляется ли картинка
-                    if (ImageEdit && FileInf != null)
-                    {
-                        ImageMethod();
-                    }
-                    _dialogService.ShowMessage("Вопрос успешно добавлен.");
-                }
-                // редактирование
-                if (VisibilityEdit)
-                {
-                    if (ImageEdit)
-                    {
-                        ImageMethod();
-                    }
-                    else { db.Update(dataModel); }
-                    _dialogService.ShowMessage("Вопрос успешно изменен.");
-                }
-            }
-            else
-            {
-                _dialogService.ShowError("Такой вопрос уже существует.", "Ошибка добавления вопроса");
-            }
+            return true;
         }
-        private void ImageMethod()
-        {
-            var dataModel = new TestQuestionDataModel();
-            // добавление или редактирование картинки
-            if (FileInf != null)
-            {
-                string currentDir = Directory.GetCurrentDirectory();
-                dataModel = _mapper.Map<TestQuestionDataModel>(TestQuestion);
-                int idQuestion = (int)db.GetIdQuestions(dataModel);
-                string dirName = @"Images\";
-                // если папка не существует
-                if (!Directory.Exists(dirName))
-                {
-                    Directory.CreateDirectory(dirName);
-                }
-                string fileType = FileInf.Extension;
-                string newPath = dirName + idQuestion + fileType;
-                string fullNewPath = currentDir + "\\" + newPath;
-                if (File.Exists(fullNewPath))
-                {
-                    try { File.Delete(fullNewPath); }
-                    catch
-                    {
-                        _dialogService.ShowError("Старая картинка не удалена с диска.", "Ошибка удаления картинки");
-                    }
-                }
 
-                if (FileInf.Exists)
-                {                    
-                    FileInf.CopyTo(newPath, true);
-                    TestQuestion.ImageQuestion = newPath;
-                    TestQuestion.FullImageQuestion = fullNewPath;
-                    dataModel = _mapper.Map<TestQuestionDataModel>(TestQuestion);
-                    db.Update(dataModel);
+        private void AddImage(object obj)
+        {
+            if (!_dialogService.OpenFileDialog("Выберите картинку", "Изображения (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg"))
+                return;
+
+            ImagePath = _dialogService.FilePath;
+
+            _fileInfo = new FileInfo(ImagePath);
+
+            TestQuestion.ImageQuestionBytes =
+                File.ReadAllBytes(ImagePath);
+
+            LoadImageFromBytes();
+
+            VisibilityDelete = true;
+
+            ImageEdit = true;
+
+            RaisePropertyChanged(nameof(VisibilityDelete));
+        }
+
+        private void DeleteImage(object obj)
+        {
+            TestQuestion.ImageQuestionBytes = null;
+
+            ImageSource = null;
+
+            _fileInfo = null;
+
+            VisibilityDelete = false;
+
+            TitleImageButton = " Добавить картинку ";
+
+            ImageEdit = true;
+
+            RaisePropertyChanged(nameof(VisibilityDelete));
+
+            RaisePropertyChanged(nameof(TitleImageButton));
+        }
+
+        private async Task MigrateOldDatabase()
+        {
+            if (!_dialogService.OpenFileDialog("Выберите базу данных", "Data Base File (*.db)|*.db"))
+                return;
+            string oldDbPath = _dialogService.FilePath;
+            try
+            {
+                // Диалог ввода специальности
+                string? specialityName = _dialogService.ShowInputDialog(
+                    "Введите название новой специальности.\n" +
+                    "Если оставить пустым — будут импортированы только темы.", "Добавление специальности");
+                if (specialityName == null)
+                {
+                    return;
+                }
+                Mouse.OverrideCursor = Cursors.Wait;
+                specialityName = specialityName?.Trim();
+                if (string.IsNullOrWhiteSpace(specialityName))
+                {
+                    specialityName = null;
+                }
+                await _migrationService.MigrateDataAsync(
+                    oldDbPath,
+                    specialityName);
+                // Обновление UI
+                var updatedThemes = _unitOfWork.Questions.GetThemes();
+                Themes.Clear();
+                foreach (var theme in updatedThemes)
+                {
+                    Themes.Add(theme);
+                }
+                if (specialityName is null)
+                {
+                    _dialogService.ShowMessage(
+                        "Темы и вопросы успешно импортированы.");
                 }
                 else
                 {
-                    _dialogService.ShowError("Картинка не найдена в источнике.", "Ошибка сохранения картинки");
+                    _dialogService.ShowMessage(
+                        $"Создана специальность \"{specialityName}\" и импортированы темы.");
                 }
-
-            }
-            // картинка удалена
-            if (FileInf == null)
-            {
-                try
-                {
-                    File.Delete(TestQuestion.FullImageQuestion);
-                }
-                catch (Exception ex)
-                {
-                    _dialogService.ShowError($"Ошибка удаления файла с диска: {ex.Message}", "Ошибка");
-                }
-                TestQuestion.ImageQuestion = null;
-                TestQuestion.FullImageQuestion = null;
-                dataModel = _mapper.Map<TestQuestionDataModel>(TestQuestion);
-                db.Update(dataModel);
-                _dialogService.ShowMessage("Вопрос успешно изменен, картинка с вопроса удалена.");
-            }
-        }
-
-        private void DeleteImageForQuestion(TestQuestion question)
-        {
-            try
-            {
-                File.Delete(question.FullImageQuestion);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка удаления файла: {ex.Message}",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _dialogService.ShowError(
+                    $"Ошибка миграции: {ex.Message}",
+                    "Ошибка");
             }
-
-            // Обнуляем ссылки в вопросе
-            question.ImageQuestion = null;
-            question.FullImageQuestion = null;
-            var dataModel = _mapper.Map<TestQuestionDataModel>(TestQuestion);
-            db.Update(dataModel);
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
         }
 
-        /// <summary>
-        /// Сохраняет картинку для вопроса.
-        /// </summary>
-        private void SaveImageForQuestion(TestQuestion question, FileInfo file)
+        private void SampleFile(object obj)
         {
-            if (file == null || !file.Exists)
+            _windowService.ShowSample();
+        }
+
+        private void AddNewTheme(object obj)
+        {
+            string? themeName =
+    _dialogService.ShowInputDialog(
+        "Введите название новой темы.",
+        "Добавление темы");
+
+            if (string.IsNullOrWhiteSpace(themeName))
                 return;
 
-            string currentDir = Directory.GetCurrentDirectory();
-            string dirName = @"Images\";
+            themeName = themeName.Trim();
 
-            // Если раньше картинка лежала в спецпапке
-            if (!string.IsNullOrEmpty(question.ImageQuestion) &&
-                question.ImageQuestion.StartsWith("I"))
-            {
-                dirName = @"1Images\";
-            }
-
-            // Создаём папку, если её нет
-            if (!Directory.Exists(dirName))
-            {
-                Directory.CreateDirectory(dirName);
-            }
-
-            // Формируем пути
-            string fileType = file.Extension;
-            string newRelativePath = dirName + question.QuestionId + fileType;
-            string fullNewPath = currentDir + "\\" + newRelativePath;
-
-            // Удаляем старый файл, если существует
-            if (File.Exists(fullNewPath))
-            {
-                try { File.Delete(fullNewPath); }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка удаления старого файла: {ex.Message}",
-                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-
-            // Копируем новый файл
             try
             {
-                file.CopyTo(fullNewPath, true);
+                // =====================================================
+                // ИЩЕМ ТЕМУ
+                // =====================================================
+
+                var existingTheme = _unitOfWork.Themes
+                    .GetAll()
+                    .FirstOrDefault(x =>
+                        x.Name.ToLower() == themeName.ToLower());
+
+                // =====================================================
+                // СПЕЦИАЛЬНОСТЬ НЕ ВЫБРАНА
+                // =====================================================
+
+                if (string.IsNullOrWhiteSpace(SelectionSpeciality))
+                {
+                    // Тема уже существует
+                    if (existingTheme != null)
+                    {
+                        _dialogService.ShowMessage(
+                            "Такая тема уже существует.");
+
+                        return;
+                    }
+
+                    // Создаём тему без специальности
+                    var newTheme = new Theme
+                    {
+                        Name = themeName
+                    };
+
+                    _unitOfWork.Themes.Create(newTheme);
+
+                    _unitOfWork.SaveAsync();
+
+                    Themes.Add(newTheme.Name);
+
+                    _dialogService.ShowMessage(
+                        "Тема успешно добавлена.");
+
+                    return;
+                }
+
+                // =====================================================
+                // ИЩЕМ СПЕЦИАЛЬНОСТЬ (TRACKED)
+                // =====================================================
+
+                var speciality = _unitOfWork.Specialities
+                    .GetAll()
+                    .FirstOrDefault(x =>
+                        x.Name == SelectionSpeciality);
+
+                if (speciality == null)
+                {
+                    _dialogService.ShowError(
+                        "Специальность не найдена.",
+                        "Ошибка");
+
+                    return;
+                }
+
+                // Получаем TRACKED сущность
+                speciality = _unitOfWork.Specialities
+                    .GetTracked(speciality.SpecialityId);
+
+                if (speciality == null)
+                {
+                    _dialogService.ShowError(
+                        "Не удалось получить специальность.",
+                        "Ошибка");
+
+                    return;
+                }
+
+                // =====================================================
+                // ТЕМЫ НЕТ -> СОЗДАЁМ НОВУЮ
+                // =====================================================
+
+                if (existingTheme == null)
+                {
+                    var newTheme = new Theme
+                    {
+                        Name = themeName
+                    };
+
+                    newTheme.Specialities.Add(speciality);
+
+                    _unitOfWork.Themes.Create(newTheme);
+
+                    _unitOfWork.SaveAsync();
+
+                    Themes.Add(newTheme.Name);
+
+                    _dialogService.ShowMessage(
+                        "Тема успешно добавлена.");
+
+                    return;
+                }
+
+                // =====================================================
+                // ПОЛУЧАЕМ TRACKED THEME С SPECIALITIES
+                // =====================================================
+
+                existingTheme = _unitOfWork.Themes
+                    .GetThemeWithSpecialities(existingTheme.ThemeId);
+
+                if (existingTheme == null)
+                {
+                    _dialogService.ShowError(
+                        "Тема не найдена.",
+                        "Ошибка");
+
+                    return;
+                }
+
+                // =====================================================
+                // ПРОВЕРЯЕМ ПРИВЯЗКУ
+                // =====================================================
+
+                bool alreadyLinked =
+                    existingTheme.Specialities
+                        .Any(x =>
+                            x.SpecialityId ==
+                            speciality.SpecialityId);
+
+                if (alreadyLinked)
+                {
+                    _dialogService.ShowMessage(
+                        "Тема уже привязана к данной специальности.");
+
+                    return;
+                }
+
+                // =====================================================
+                // СПРАШИВАЕМ ПРИВЯЗКУ
+                // =====================================================
+
+                bool attachTheme =
+                    MessageBox.Show(
+                        $"Тема \"{existingTheme.Name}\" уже существует.\n\n" +
+                        $"Привязать её к специальности \"{speciality.Name}\"?",
+                        "Привязка темы",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question)
+                    == MessageBoxResult.Yes;
+
+                if (!attachTheme)
+                    return;
+
+                // =====================================================
+                // ДОБАВЛЯЕМ СВЯЗЬ
+                // =====================================================
+
+                existingTheme.Specialities.Add(speciality);
+
+                // Update НЕ НУЖЕН
+                // EF уже отслеживает existingTheme
+
+                 _unitOfWork.SaveAsync();
+
+                if (!Themes.Contains(existingTheme.Name))
+                {
+                    Themes.Add(existingTheme.Name);
+                }
+
+                _dialogService.ShowMessage(
+                    "Тема успешно привязана к специальности.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка сохранения картинки: {ex.Message}",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                _dialogService.ShowError(
+                    $"Ошибка добавления темы:\n{ex.Message}",
+                    "Ошибка");
             }
-
-            // Обновляем ссылки в вопросе
-            question.ImageQuestion = newRelativePath;
-            question.FullImageQuestion = fullNewPath;
-            var dataModel = _mapper.Map<TestQuestionDataModel>(TestQuestion);
-            db.Update(dataModel);
         }
 
-        private void CloseWindows(object obj)
+        private void RaiseAllProperties()
         {
-            foreach (Window window in Application.Current.Windows)
-            {
-                window.Close();
-            }
+            RaisePropertyChanged(nameof(Title));
+            RaisePropertyChanged(nameof(VisibilityAdd));
+            RaisePropertyChanged(nameof(VisibilityEdit));
+            RaisePropertyChanged(nameof(VisibilityDelete));
+            RaisePropertyChanged(nameof(VisibilityImportButtons));
         }
-        public event PropertyChangedEventHandler PropertyChanged;
+
+        public event PropertyChangedEventHandler?
+            PropertyChanged;
+
         private void RaisePropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(propertyName));
         }
     }
 }

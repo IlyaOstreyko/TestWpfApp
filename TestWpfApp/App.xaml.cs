@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using TestWpfApp.Data.Context;
 using TestWpfApp.Data.Interfaces;
 using TestWpfApp.Data.Repositories;
+using TestWpfApp.Data.UnitOfWork;
 using TestWpfApp.Interfaces;
 using TestWpfApp.Mappers;
 using TestWpfApp.Service;
@@ -29,31 +30,31 @@ namespace TestWpfApp
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationContext>(options =>
-        options.UseSqlite("Data Source=TestApp.db"));
+                options.UseSqlite("Data Source=TestApp.db"));
             services.AddAutoMapper(typeof(MappersQuestion));
             // Services
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<IWindowService, WindowService>();
             services.AddSingleton<IWindowFactory, WindowFactory>();
-            services.AddTransient<MigrationOldTableService>();
+            services.AddScoped<MigrationOldTableService>();
+            services.AddScoped<QuestionFileImporter>();
             // Repositories
-            services.AddTransient<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             // ViewModels
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<AdminDataViewModel>();
             services.AddTransient<AdminDataWindow>();
-            //services.AddTransient<AddQuestionViewModel>();
-            //services.AddTransient<EditQuestionsViewModel>();
-            //services.AddTransient<ResaultsViewModel>();
-            //services.AddTransient<ShowQuestionViewModel>();
-            //services.AddTransient<ShowThemesViewModel>();
-            //services.AddTransient<UserViewModel>();
+            services.AddTransient<AdminGroupsDataWindow>();
+            services.AddTransient<AdminGroupsDataViewModel>();
+            services.AddTransient<EditQuestionsViewModel>();
+            services.AddTransient<AddQuestionViewModel>();
             // Windows
             services.AddTransient<MainWindow>();
             services.AddTransient<AddQuestion>();
             services.AddTransient<EditQuestions>();
             services.AddTransient<NewTheme>();
-            services.AddTransient<Resaults>();
+            //services.AddTransient<Resaults>();
             services.AddTransient<Sample>();
             services.AddTransient<ShowQuestion>();
             services.AddTransient<ShowThemes>();

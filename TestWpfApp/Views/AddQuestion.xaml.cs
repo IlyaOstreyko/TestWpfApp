@@ -26,40 +26,11 @@ namespace TestWpfApp.Views
     /// </summary>
     public partial class AddQuestion : Window
     {
-        public AddQuestion()
+        public AddQuestion(AddQuestionViewModel viewModel)
         {
-            //InitializeComponent();
-            //TestQuestion = testQuestion;
-            //DataContext = TestQuestion;
-
             InitializeComponent();
-            //DataContext = new AddQuestionViewModel();
-            var db = App.HostContainer!.Services.GetRequiredService<IQuestionRepository>();
-            var dialog = App.HostContainer.Services.GetRequiredService<IDialogService>();
-            var window = App.HostContainer.Services.GetRequiredService<IWindowService>();
-            var mapper = App.HostContainer.Services.GetRequiredService<IMapper>();
-            var migrationOldTableService = App.HostContainer.Services.GetRequiredService<MigrationOldTableService>();
-            
 
-            // Pass the services into the ViewModel alongside the runtime testQuestion parameter
-            DataContext = new AddQuestionViewModel(dialog, window, db, mapper, migrationOldTableService);
-        }
-        public AddQuestion(TestQuestion testQuestion)
-        {
-            //InitializeComponent();
-            //TestQuestion = testQuestion;
-            //DataContext = TestQuestion;
-
-            InitializeComponent();
-            //DataContext = new AddQuestionViewModel(testQuestion);
-            var db = App.HostContainer!.Services.GetRequiredService<IQuestionRepository>();
-            var dialog = App.HostContainer.Services.GetRequiredService<IDialogService>();
-            var window = App.HostContainer.Services.GetRequiredService<IWindowService>();
-            var mapper = App.HostContainer.Services.GetRequiredService<IMapper>();
-
-            // Pass the services into the ViewModel alongside the runtime testQuestion parameter
-            DataContext = new AddQuestionViewModel(testQuestion, dialog, window, db, mapper);
-            //DataContext = App.HostContainer!.Services.GetRequiredService<AddQuestionViewModel>();
+            DataContext = viewModel;
         }
     }
 }

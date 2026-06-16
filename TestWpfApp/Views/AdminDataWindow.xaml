@@ -67,7 +67,7 @@
                     </Grid.RowDefinitions>
                     <ListBox ItemsSource="{Binding Specialities}" 
                              SelectedItem="{Binding SelectedSpeciality}"
-                             DisplayMemberPath="NameSpeciality" 
+                             DisplayMemberPath="Name" 
                              FontSize="14" Margin="0,5"/>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -93,14 +93,65 @@
 
                     <TextBlock Text="Доступные темы для привязки:" FontWeight="Normal" Margin="0,0,0,5"/>
 
-                    <ListBox Grid.Row="1" ItemsSource="{Binding AvailableThemes}" Margin="0,5">
+                    <ListBox 
+                        Grid.Row="1" 
+                        ItemsSource="{Binding AvailableThemes}" 
+                        Margin="0,5">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <CheckBox Content="{Binding NameTheme}" 
-                                          IsChecked="{Binding IsLinked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          Command="{Binding DataContext.ToggleThemeLinkCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                          CommandParameter="{Binding}"
-                                          FontSize="14" Margin="2"/>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="650" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <CheckBox 
+                                        Grid.Column="0" 
+                                        Content="{Binding NameTheme}" 
+                                        IsChecked="{Binding IsLinked,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                        Command="{Binding DataContext.ToggleThemeLinkCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        VerticalAlignment="Center"/>
+                                    <TextBlock 
+                                        Grid.Column="1"
+                                        Text="{Binding TotalQuestionsCount, StringFormat='({0})'}" 
+                                        Foreground="Gray" 
+                                        FontSize="12" 
+                                        VerticalAlignment="Center" 
+                                        Margin="10,0,0,0" 
+                                        FontWeight="Normal"/>
+                                    <StackPanel 
+                                        Grid.Column="2" 
+                                        Orientation="Horizontal" 
+                                        Visibility="{Binding IsLinked, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock 
+                                            Text="По-умолчанию:" 
+                                            VerticalAlignment="Center" 
+                                            Margin="10,0,5,0" FontWeight="Normal" 
+                                            FontSize="12"/>
+                                        <TextBox 
+                                            Width="50"
+                                            Height="24"
+                                            PreviewTextInput="NumberValidationTextBox"
+                                            TextChanged="QuestionCount_TextChanged"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center">
+                                            <TextBox.Text>
+                                                <Binding 
+                                                    Path="QuestionCount"
+                                                    Mode="TwoWay"
+                                                    UpdateSourceTrigger="PropertyChanged"/>
+                                            </TextBox.Text>
+
+                                            <!-- Чтобы сохранять при выходе из поля -->
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Key="Enter" Command="{Binding DataContext.SaveCountCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                            </TextBox.InputBindings>
+                                        </TextBox>
+
+                                    </StackPanel>
+                                </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>

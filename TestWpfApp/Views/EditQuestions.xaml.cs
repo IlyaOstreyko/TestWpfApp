@@ -24,18 +24,19 @@ namespace TestWpfApp.Views
     /// </summary>
     public partial class EditQuestions : Window
     {
-        public EditQuestions(string title, bool editTrue)
+        public EditQuestions(EditQuestionsViewModel vm)
         {
             InitializeComponent();
 
-            // Извлекаем необходимые сервисы из DI-контейнера
-            var db = App.HostContainer!.Services.GetRequiredService<IQuestionRepository>();
-            var dialog = App.HostContainer.Services.GetRequiredService<IDialogService>();
-            var window = App.HostContainer.Services.GetRequiredService<IWindowService>();
-            var mapper = App.HostContainer.Services.GetRequiredService<IMapper>();
+            DataContext = vm;
+        }
 
-            // Передаем сервисы и параметры в ViewModel
-            DataContext = new EditQuestionsViewModel(title, editTrue, db, dialog, window, mapper);
+        public void Initialize(string title, bool editMode, int specialityId)
+        {
+            if (DataContext is EditQuestionsViewModel vm)
+            {
+                vm.Initialize(title, editMode, specialityId);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using System.Windows;
 using TestWpfApp.Interfaces;
+using TestWpfApp.Views;
 
 namespace TestWpfApp.Service
 {
@@ -23,7 +24,22 @@ namespace TestWpfApp.Service
             }
             return false;
         }
+        public bool OpenFileDialog(string title, string filter)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = title,
+                Filter = filter
+            };
 
+            if (openFileDialog.ShowDialog() == true)
+            {
+                FilePath = openFileDialog.FileName;
+                return true;
+            }
+
+            return false;
+        }
         public bool SaveFileDialog()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -51,6 +67,14 @@ namespace TestWpfApp.Service
                 title,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question) == MessageBoxResult.Yes;
+        }
+        public string? ShowInputDialog(string message, string title = "Ввод данных")
+        {
+            var dialog = new InputDialog(message, title);
+            bool? result = dialog.ShowDialog();
+            return result == true
+                ? dialog.ResponseText
+                : null;
         }
     }
 }

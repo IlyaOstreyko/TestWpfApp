@@ -19,7 +19,7 @@ namespace TestWpfApp.ViewModels
     {
         private UserInfo userInfo;
         private int allNumberQuestions;
-        private List<TestQuestion> TestQuestions { get; set; }
+        private List<TestQuestionVM> TestQuestions { get; set; }
         private List<Result> Results;
         
         public UserInfo UserInfo
@@ -43,15 +43,14 @@ namespace TestWpfApp.ViewModels
             }
         }
 
-        public UserViewModel(List<TestQuestion> questions, List<Result> results)
-        {
-
-            
+        public UserViewModel(List<TestQuestionVM> questions, List<Result> results, string speciality)
+        {            
             TestQuestions = questions;
             Results = results;
             
             AllNumberQuestions = questions.Count;
             UserInfo = new UserInfo();
+            if (speciality != null) { UserInfo.PositionUser = speciality; }            
             try
             {
                 string currentDir = Directory.GetCurrentDirectory();
@@ -63,7 +62,9 @@ namespace TestWpfApp.ViewModels
                 UserInfo.PositionCommissionMember1 = lines[3];
                 UserInfo.Time = Int32.Parse(lines[4]);
             }            
-            catch { }
+            catch 
+            {
+            }
             UserInfo.Date = DateTime.Now.Date;
         }
 

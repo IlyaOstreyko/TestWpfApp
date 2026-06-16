@@ -11,25 +11,29 @@ using TestWpfApp.Models;
 using TestWpfApp.Data.Interfaces;
 using AutoMapper;
 using TestWpfApp.Data.DataModels;
+using Microsoft.Extensions.FileProviders;
 
 namespace TestWpfApp.Service
 {
     public class QuestionFileImporter
     {
-        private readonly IQuestionRepository db;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
         public OpenFileDialog openFileDialog;
         public FileInfo FileInf;
-        public event Action<int> ProgressChanged; // 🔔 Событие для уведомления о прогрессе
-        public QuestionFileImporter(IQuestionRepository repository)
+
+        public event Action<int>? ProgressChanged;
+        public QuestionFileImporter(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            db = repository;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         /// <summary>
         /// Основной метод, который читает вопросы из файла и добавляет их в БД.
         /// </summary>
         /// <param name="filePath">Полный путь к файлу (.txt, .wop)</param>
-        public void AddQuestionsFromFile(IMapper _mapper)
+        public void AddQuestionsFromFile()
         {
             openFileDialog = new OpenFileDialog()
             {
@@ -42,7 +46,7 @@ namespace TestWpfApp.Service
                 {
                     FileInf = new FileInfo(openFileDialog.FileName);
                 }
-                List<TestQuestion> testQuestions = new List<TestQuestion>();
+                List<Models.TestQuestionVM> testQuestions = new List<Models.TestQuestionVM>();
                 testQuestions = ReadQuestionsFromFile(FileInf.FullName);
 
                 if (testQuestions.Count == 0)
@@ -55,12 +59,28 @@ namespace TestWpfApp.Service
 
                 int addedCount = 0;
                 int total = testQuestions.Count;
-                foreach (TestQuestion testQuestion in testQuestions)
+                foreach (Models.TestQuestionVM testQuestion in testQuestions)
                 {
-                    var question = _mapper.Map<TestQuestionDataModel>(testQuestion);
-                    if (!db.CheckQuestions(question))
+                    var theme = _unitOfWork.Themes.GetByName(testQuestion.NameTheme);
+
+                    if (theme == null)
                     {
-                        db.Create(question);
+                        theme = new Theme
+                        {
+                            Name = testQuestion.NameTheme
+                        };
+
+                        _unitOfWork.Themes.Create(theme);
+
+                        _unitOfWork.SaveAsync();
+                    }
+
+                    testQuestion.ThemeId = theme.ThemeId;
+                    var question = _mapper.Map<Data.DataModels.TestQuestion>(testQuestion);
+                    if (!_unitOfWork.Questions.CheckQuestions(question))
+                    {
+                        _unitOfWork.Questions.Create(question);
+                        _unitOfWork.SaveAsync();
                         x++;
                         addedCount++;
                     }
@@ -80,9 +100,9 @@ namespace TestWpfApp.Service
         /// <summary>
         /// Считывает и разбирает текстовый файл в список вопросов.
         /// </summary>
-        private List<TestQuestion> ReadQuestionsFromFile(string path)
+        private List<Models.TestQuestionVM> ReadQuestionsFromFile(string path)
         {
-            List<TestQuestion> testQuestions = new List<TestQuestion>();
+            List<Models.TestQuestionVM> testQuestions = new List<Models.TestQuestionVM>();
             List<string> themes = new List<string>();
             string w = "";
 
@@ -136,7 +156,7 @@ namespace TestWpfApp.Service
                             themes.Add("   " + input);
                         }
 
-                        TestQuestion testQuestion = new TestQuestion();
+                        Models.TestQuestionVM testQuestion = new Models.TestQuestionVM();
                         try
                         {
                             testQuestion = StringOnQuestion(currentParagraph, path);
@@ -198,9 +218,9 @@ namespace TestWpfApp.Service
         /// <summary>
         /// Преобразует блок текста (один вопрос) в объект TestQuestion.
         /// </summary>
-        TestQuestion StringOnQuestion(string currentParagraph, string path)
+        Models.TestQuestionVM StringOnQuestion(string currentParagraph, string path)
         {
-            TestQuestion testQuestion = new TestQuestion();
+            Models.TestQuestionVM testQuestion = new Models.TestQuestionVM();
             int finishNoAndThemeAndArticle = currentParagraph.IndexOf("\r\n");
             string NoAndThemeAndArticle = currentParagraph.Substring(0, finishNoAndThemeAndArticle).Trim();
             string theme = "";
@@ -250,16 +270,17 @@ namespace TestWpfApp.Service
 
                 try
                 {
-                    if (!Directory.Exists(newPath))
-                    {
-                        Directory.CreateDirectory(newPath);
-                    }
+                    //if (!Directory.Exists(newPath))
+                    //{
+                    //    Directory.CreateDirectory(newPath);
+                    //}
                     //if (Directory.Exists(targetPath))
                     //{
                     //    targetPath += "1";
                     //    image += "1";
                     //}
-                    File.Copy(dirName, targetPath, true);
+                    //File.Copy(dirName, targetPath, true);
+                    testQuestion.ImageQuestionBytes = File.ReadAllBytes(dirName);
                     testQuestion.ImageQuestion = image;
                 }
                 catch

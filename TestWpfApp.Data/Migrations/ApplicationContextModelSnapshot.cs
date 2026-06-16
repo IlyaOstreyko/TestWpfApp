@@ -16,94 +16,96 @@ namespace TestWpfApp.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.14");
 
-            modelBuilder.Entity("GroupDataModelSpecialityDataModel", b =>
+            modelBuilder.Entity("GroupSpeciality", b =>
                 {
-                    b.Property<int>("GroupsDataModelGroupId")
+                    b.Property<int>("GroupsGroupId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SpecialitysDataModelSpecialityId")
+                    b.Property<int>("SpecialitiesSpecialityId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("GroupsDataModelGroupId", "SpecialitysDataModelSpecialityId");
+                    b.HasKey("GroupsGroupId", "SpecialitiesSpecialityId");
 
-                    b.HasIndex("SpecialitysDataModelSpecialityId");
+                    b.HasIndex("SpecialitiesSpecialityId");
 
-                    b.ToTable("GroupDataModelSpecialityDataModel");
+                    b.ToTable("GroupSpeciality");
                 });
 
-            modelBuilder.Entity("SpecialityDataModelThemeDataModel", b =>
+            modelBuilder.Entity("SpecialityTheme", b =>
                 {
-                    b.Property<int>("SpecialitysDataModelSpecialityId")
+                    b.Property<int>("SpecialitiesSpecialityId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ThemesDataModelThemeId")
+                    b.Property<int>("ThemesThemeId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("SpecialitysDataModelSpecialityId", "ThemesDataModelThemeId");
+                    b.HasKey("SpecialitiesSpecialityId", "ThemesThemeId");
 
-                    b.HasIndex("ThemesDataModelThemeId");
+                    b.HasIndex("ThemesThemeId");
 
-                    b.ToTable("SpecialityDataModelThemeDataModel");
+                    b.ToTable("SpecialityTheme");
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.GroupDataModel", b =>
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.Group", b =>
                 {
                     b.Property<int>("GroupId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("NameGroup")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ThemeDataModelThemeId")
+                    b.Property<int?>("ThemeId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("GroupId");
 
-                    b.HasIndex("ThemeDataModelThemeId");
+                    b.HasIndex("ThemeId");
 
-                    b.ToTable("GroupDataModels");
+                    b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.SettingsSpecialityDataModel", b =>
-                {
-                    b.Property<int>("SettingsSpecialityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("NumberQuestionsInTheme")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("SpecialityDataModelSpecialityId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ThemeDataModelThemeId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("SettingsSpecialityId");
-
-                    b.HasIndex("SpecialityDataModelSpecialityId");
-
-                    b.HasIndex("ThemeDataModelThemeId");
-
-                    b.ToTable("SettingsSpecialityDataModel");
-                });
-
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.SpecialityDataModel", b =>
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.Speciality", b =>
                 {
                     b.Property<int>("SpecialityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("NameSpeciality")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("SpecialityId");
 
-                    b.ToTable("SpecialityDataModels");
+                    b.ToTable("Specialities");
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.TestQuestionDataModel", b =>
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.SpecialityThemeSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuestionsCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SpecialityId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ThemeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpecialityId");
+
+                    b.HasIndex("ThemeId");
+
+                    b.ToTable("SpecialityThemeSettings");
+                });
+
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.TestQuestion", b =>
                 {
                     b.Property<int>("QuestionId")
                         .ValueGeneratedOnAdd()
@@ -139,102 +141,108 @@ namespace TestWpfApp.Data.Migrations
                     b.Property<string>("NameTheme")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ThemeDataModelThemeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ThemeId")
+                    b.Property<int>("ThemeId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("QuestionId");
 
-                    b.HasIndex("ThemeDataModelThemeId");
+                    b.HasIndex("ThemeId");
 
-                    b.ToTable("TestQuestionDataModels");
+                    b.ToTable("TestQuestions");
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.ThemeDataModel", b =>
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.Theme", b =>
                 {
                     b.Property<int>("ThemeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("NameTheme")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("ThemeId");
 
-                    b.ToTable("ThemeDataModels");
+                    b.ToTable("Themes");
                 });
 
-            modelBuilder.Entity("GroupDataModelSpecialityDataModel", b =>
+            modelBuilder.Entity("GroupSpeciality", b =>
                 {
-                    b.HasOne("TestWpfApp.Data.DataModels.GroupDataModel", null)
+                    b.HasOne("TestWpfApp.Data.DataModels.Group", null)
                         .WithMany()
-                        .HasForeignKey("GroupsDataModelGroupId")
+                        .HasForeignKey("GroupsGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TestWpfApp.Data.DataModels.SpecialityDataModel", null)
+                    b.HasOne("TestWpfApp.Data.DataModels.Speciality", null)
                         .WithMany()
-                        .HasForeignKey("SpecialitysDataModelSpecialityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SpecialityDataModelThemeDataModel", b =>
-                {
-                    b.HasOne("TestWpfApp.Data.DataModels.SpecialityDataModel", null)
-                        .WithMany()
-                        .HasForeignKey("SpecialitysDataModelSpecialityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TestWpfApp.Data.DataModels.ThemeDataModel", null)
-                        .WithMany()
-                        .HasForeignKey("ThemesDataModelThemeId")
+                        .HasForeignKey("SpecialitiesSpecialityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.GroupDataModel", b =>
+            modelBuilder.Entity("SpecialityTheme", b =>
                 {
-                    b.HasOne("TestWpfApp.Data.DataModels.ThemeDataModel", null)
-                        .WithMany("GroupsDataModel")
-                        .HasForeignKey("ThemeDataModelThemeId");
-                });
-
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.SettingsSpecialityDataModel", b =>
-                {
-                    b.HasOne("TestWpfApp.Data.DataModels.SpecialityDataModel", null)
-                        .WithMany("SettingsSpecialitysDataModel")
-                        .HasForeignKey("SpecialityDataModelSpecialityId");
-
-                    b.HasOne("TestWpfApp.Data.DataModels.ThemeDataModel", "ThemeDataModel")
+                    b.HasOne("TestWpfApp.Data.DataModels.Speciality", null)
                         .WithMany()
-                        .HasForeignKey("ThemeDataModelThemeId");
+                        .HasForeignKey("SpecialitiesSpecialityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("ThemeDataModel");
+                    b.HasOne("TestWpfApp.Data.DataModels.Theme", null)
+                        .WithMany()
+                        .HasForeignKey("ThemesThemeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.TestQuestionDataModel", b =>
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.Group", b =>
                 {
-                    b.HasOne("TestWpfApp.Data.DataModels.ThemeDataModel", "ThemeDataModel")
-                        .WithMany("QuestionsDataModel")
-                        .HasForeignKey("ThemeDataModelThemeId");
-
-                    b.Navigation("ThemeDataModel");
+                    b.HasOne("TestWpfApp.Data.DataModels.Theme", null)
+                        .WithMany("Groups")
+                        .HasForeignKey("ThemeId");
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.SpecialityDataModel", b =>
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.SpecialityThemeSetting", b =>
                 {
-                    b.Navigation("SettingsSpecialitysDataModel");
+                    b.HasOne("TestWpfApp.Data.DataModels.Speciality", "Speciality")
+                        .WithMany("ThemeSettings")
+                        .HasForeignKey("SpecialityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TestWpfApp.Data.DataModels.Theme", "Theme")
+                        .WithMany()
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Speciality");
+
+                    b.Navigation("Theme");
                 });
 
-            modelBuilder.Entity("TestWpfApp.Data.DataModels.ThemeDataModel", b =>
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.TestQuestion", b =>
                 {
-                    b.Navigation("GroupsDataModel");
+                    b.HasOne("TestWpfApp.Data.DataModels.Theme", "Theme")
+                        .WithMany("Questions")
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("QuestionsDataModel");
+                    b.Navigation("Theme");
+                });
+
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.Speciality", b =>
+                {
+                    b.Navigation("ThemeSettings");
+                });
+
+            modelBuilder.Entity("TestWpfApp.Data.DataModels.Theme", b =>
+                {
+                    b.Navigation("Groups");
+
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }
